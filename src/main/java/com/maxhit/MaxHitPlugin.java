@@ -357,7 +357,7 @@ public class MaxHitPlugin extends Plugin {
 
 	//Ranged equipment bonus
 	public int rangedStrengthBonus() {
-		int rangedStrBonus = 0;
+		int rangedStrengthBonus = 0;
 
 		int[] ids = client.getLocalPlayer().getPlayerComposition().getEquipmentIds();
 		for (int x : ids) {
@@ -365,7 +365,7 @@ public class MaxHitPlugin extends Plugin {
 				int id = x - 512;
 				final ItemStats stats = itemManager.getItemStats(id, false);
 				final ItemEquipmentStats currentEquipment = stats.getEquipment();
-				rangedStrBonus += currentEquipment.getRstr();
+				rangedStrengthBonus += currentEquipment.getRstr();
 			}
 			else { ; }
 		}
@@ -388,14 +388,14 @@ public class MaxHitPlugin extends Plugin {
 								//return client.getItemDefinition(ammoID).getName();
 								final ItemStats ammoStats = itemManager.getItemStats(ammoID, false);
 								final ItemEquipmentStats ammoEquipment = ammoStats.getEquipment();
-								rangedStrBonus += ammoEquipment.getRstr();
+								rangedStrengthBonus += ammoEquipment.getRstr();
 							}
 						}
 					}
 				}
 			}
 		}
-		return rangedStrBonus;
+		return rangedStrengthBonus;
 	}
 
 
