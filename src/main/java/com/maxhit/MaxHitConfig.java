@@ -47,3 +47,4 @@ public interface MaxHitConfig extends Config {
 	)
 	default boolean applyCharge() { return false; }
 }
+
