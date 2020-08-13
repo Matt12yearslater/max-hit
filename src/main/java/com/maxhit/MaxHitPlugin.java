@@ -68,9 +68,8 @@ public class MaxHitPlugin extends Plugin {
 		final ItemContainer equipment = client.getItemContainer(InventoryID.EQUIPMENT);
 		if (equipment != null) {
 			Item[] items = equipment.getItems();
-			if (items != null) {
+			if (items != null && items.length >= 10) {
 				// IDs of relevant equipment slots
-				int bootsID = items[EquipmentInventorySlot.HEAD.getSlotIdx()].getId();
 				int bodyID = items[EquipmentInventorySlot.BODY.getSlotIdx()].getId();
 				int legsID = items[EquipmentInventorySlot.LEGS.getSlotIdx()].getId();
 				int helmID = items[EquipmentInventorySlot.HEAD.getSlotIdx()].getId();
