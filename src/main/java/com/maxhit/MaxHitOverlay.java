@@ -9,6 +9,7 @@ import net.runelite.client.ui.overlay.components.PanelComponent;
 
 import javax.inject.Inject;
 import java.awt.*;
+import java.util.HashMap;
 
 import static net.runelite.api.MenuAction.RUNELITE_OVERLAY_CONFIG;
 import static net.runelite.client.ui.overlay.OverlayManager.OPTION_CONFIGURE;
@@ -43,10 +44,10 @@ public class MaxHitOverlay extends Overlay {
                     .build());
         }
 
-        if (config.showSpec() && plugin.maxHitSpec() != -1) {
+        if (config.showSpec() && plugin.maxHitSpec(plugin.weaponName(), plugin.maxHitBase()) != -1) {
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("Max Special:")
-                    .right(Double.toString(Math.floor(plugin.maxHitSpec())))
+                    .right(Double.toString(Math.floor(plugin.maxHitSpec(plugin.weaponName(), plugin.maxHitBase()))))
                     .build());
         }
 
@@ -55,6 +56,42 @@ public class MaxHitOverlay extends Overlay {
                     .left("Magic Max Hit:")
                     .right(Double.toString(Math.floor(plugin.maxMagicHitBase())))
                     .build());
+        }
+
+
+
+
+        HashMap<String, InventoryWeapons> map = plugin.equippableItems();
+        if (map.size() != 0) {
+            for (Object weapon : map.keySet()) {
+                String wep = weapon.toString();
+                if (config.inventoryWeapons()) {
+                    panelComponent.getChildren().add(LineComponent.builder()
+                            .left(map.get(wep).name)
+                            .right(Double.toString(Math.floor(map.get(wep).maxHitBase)))
+                            .build());
+                }
+                if (map.get(wep).maxHitSpec > 0 && config.invetoryWeaponsSpecial()) {
+                    panelComponent.getChildren().add(LineComponent.builder()
+                            .left(map.get(wep).name + " Spec")
+                            .right(Double.toString(Math.floor(map.get(wep).maxHitSpec)))
+                            .build());
+                }
+                if (config.inventorySelectiveSpecial() && !config.inventoryWeapons() && !config.invetoryWeaponsSpecial()) {
+                    if (map.get(wep).maxHitSpec <= 0) {
+                        panelComponent.getChildren().add(LineComponent.builder()
+                                .left(map.get(wep).name)
+                                .right(Double.toString(Math.floor(map.get(wep).maxHitBase)))
+                                .build());
+                    }
+                    else {
+                        panelComponent.getChildren().add(LineComponent.builder()
+                                .left(map.get(wep).name + " Spec")
+                                .right(Double.toString(Math.floor(map.get(wep).maxHitSpec)))
+                                .build());
+                    }
+                }
+            }
         }
 
         return panelComponent.render(graphics);

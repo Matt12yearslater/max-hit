@@ -31,6 +31,7 @@ public interface MaxHitConfig extends Config {
 	)
 	default boolean showMagic() { return false; }
 
+
 	@ConfigItem(
 			keyName = "spellChoice",
 			name = "Spell",
@@ -46,5 +47,30 @@ public interface MaxHitConfig extends Config {
 			position = 5
 	)
 	default boolean applyCharge() { return false; }
+
+	@ConfigItem(
+			keyName = "inventoryWeapons",
+			name = "Inventory Weapons' Max Hits",
+			description = "Shows max hit of weapons in inventory. Assumes highest level prayer is used",
+			position = 6
+	)
+	default boolean inventoryWeapons() { return false; }
+
+	@ConfigItem(
+			keyName = "inventoryWeaponsSpecial",
+			name = "Inventory Weapons' Max Specs",
+			description = "Shows max spec of weapons in inventory",
+			position = 7
+	)
+	default boolean invetoryWeaponsSpecial() { return false; }
+
+	@ConfigItem(
+			keyName = "inventorySelectiveSpecial",
+			name = "Inventory Selective Spec",
+			description = "Shows spec max if weapon has spec, otherwise shows normal max. " +
+					"Do not use with previous two options",
+			position = 8
+	)
+	default boolean inventorySelectiveSpecial() { return false; }
 }
 

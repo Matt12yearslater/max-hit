@@ -1,5 +1,11 @@
 package com.maxhit;
 
+
+import static com.maxhit.AttackStyle.CASTING;
+import static com.maxhit.AttackStyle.DEFENSIVE_CASTING;
+import static com.maxhit.AttackStyle.OTHER;
+
+import com.google.common.util.concurrent.Service;
 import com.google.inject.Provides;
 import net.runelite.api.*;
 import net.runelite.client.config.ConfigManager;
@@ -10,11 +16,10 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.http.api.item.ItemStats;
 import net.runelite.http.api.item.ItemEquipmentStats;
-import static com.maxhit.AttackStyle.CASTING;
-import static com.maxhit.AttackStyle.DEFENSIVE_CASTING;
-import static com.maxhit.AttackStyle.OTHER;
 
 import javax.inject.Inject;
+import java.util.HashMap;
+
 
 
 @Slf4j
@@ -62,22 +67,265 @@ public class MaxHitPlugin extends Plugin {
 	private int castingModeVarbit = -1;
 	private AttackStyle attackStyle;
 
+	public HashMap equippableItems() {
+		HashMap<String, InventoryWeapons> inventoryWeaponsHashMap = new HashMap<>();
+		ItemContainer inventory = client.getItemContainer(InventoryID.INVENTORY);
+		if (inventory != null) {
+			Item[] inventItems = inventory.getItems();
+			if (inventItems.length != 0) {
+				for (Item item : inventItems) {
+					Integer ID = item.getId();
+					if (ID != -1) {
+						ItemStats itemStats = itemManager.getItemStats(ID, false);
+						if (itemStats != null) {
+							if (itemStats.isEquipable()) {
+								if (itemManager.getItemStats(ID, false).getEquipment().getSlot() == 3) {
+
+									String name = client.getItemDefinition(ID).getName();
+									inventoryWeaponsHashMap.put(name, new InventoryWeapons());
+									inventoryWeaponsHashMap.get(name).ID = ID;
+									inventoryWeaponsHashMap.get(name).name = name;
+
+									boolean twoHanded = itemManager.getItemStats(ID, false).getEquipment().isTwoHanded();
+									inventoryWeaponsHashMap.get(name).isTwoHanded = twoHanded;
+
+									String weaponType = new String();
+
+									if (name.contains("bow") ||
+											name.contains("knif") ||
+											name.contains("dart") ||
+											name.contains("throw") ||
+											name.contains("xil-ul") ||
+											name.contains("chompa") ||
+											name.contains("blowpipe") ||
+											name.contains("ballista")) {
+										weaponType = "Ranged";
+									} else if (name.contains("rident")) {
+										weaponType = "Trident";
+									} else {
+										weaponType = "Melee";
+									}
+									inventoryWeaponsHashMap.get(name).weaponType = weaponType;
+									if (inventoryWeaponsHashMap.get(name).weaponType.equals("Melee")) {
+										inventoryWeaponsHashMap.get(name).strBonus = itemManager.getItemStats(ID, false).getEquipment().getStr();
+									} else if (inventoryWeaponsHashMap.get(name).weaponType.equals("Ranged")) {
+										inventoryWeaponsHashMap.get(name).strBonus = itemManager.getItemStats(ID, false).getEquipment().getRstr();
+									}
+
+
+									//MAX HIT FACTORS
+
+									int style = 3; //have to assume, we can't actually get this value
+									double pray = 1;
+									double setBonus = 1;
+									int equipment = 0;
+									int level = 0;
+									int defense = client.getRealSkillLevel(Skill.DEFENCE);
+									int prayerLevel = client.getRealSkillLevel(Skill.PRAYER);
+
+									//ASSIGNMENT OF LEVEL, EQUIPMENT, AND PRAYER
+
+									//Invent weapon is melee
+									if (weaponType.equals("Melee")) {
+										level = strengthLevel();
+										equipment = strengthBonus();
+										//invent weapon is 2 handed, have weapon and shield equipped
+										if (twoHanded &&
+												equippedShieldID() != -1 &&
+												equippedWeaponID() != -1 && combatType().equals("Melee")) {
+											equipment = equipment - itemManager.getItemStats(equippedWeaponID(), false).getEquipment().getStr()
+													- itemManager.getItemStats(equippedShieldID(), false).getEquipment().getStr()
+													+ inventoryWeaponsHashMap.get(name).strBonus;
+										}
+										//invent weapon is 2 handed, have only weapon equipped
+										else if (inventoryWeaponsHashMap.get(name).isTwoHanded &&
+												equippedWeaponID() != -1 &&
+												combatType().equals("Melee")) {
+											equipment = equipment - itemManager.getItemStats(equippedWeaponID(), false).getEquipment().getStr()
+													+ inventoryWeaponsHashMap.get(name).strBonus;
+										}
+										//invent weapon is 2 handed, have only shield equipped
+										else if (inventoryWeaponsHashMap.get(name).isTwoHanded && equippedShieldID() != -1) {
+											equipment = equipment - itemManager.getItemStats(equippedShieldID(), false).getEquipment().getStr()
+													+ inventoryWeaponsHashMap.get(name).strBonus;
+										}
+										//invent weapon is 1 handed, have weapon equipped
+										else if (!inventoryWeaponsHashMap.get(name).isTwoHanded &&
+												equippedWeaponID() != -1 && combatType().equals("Melee")) {
+											equipment = equipment - itemManager.getItemStats(equippedWeaponID(), false).getEquipment().getStr()
+													+ inventoryWeaponsHashMap.get(name).strBonus;
+										}
+										//no weapon or shield equipped
+										else {
+											equipment = equipment + inventoryWeaponsHashMap.get(name).strBonus;
+										}
+
+										// have to assume using best prayer for level
+										if (prayerLevel > 1 && prayerLevel < 13) {
+											pray = 1.05;
+										} else if (prayerLevel >= 13 && prayerLevel < 31) {
+											pray = 1.1;
+										} else if (prayerLevel >= 31 && prayerLevel < 60) {
+											pray = 1.15;
+										} else if (prayerLevel >= 60 && prayerLevel < 70 && defense >= 65) {
+											pray = 1.18;
+										} else if (prayerLevel >= 70 && defense >= 70) {
+											pray = 1.23;
+										}
+									}
+
+
+									//Invent weapon is ranged
+									//have to consider whether equipped weapon is stackable or ammo
+									else if (weaponType.equals("Ranged")) {
+										level = rangedLevel();
+
+										//have ranged weapon equipped
+										//takes care of case where invent weapon is stackable and invent weapon isnt stackable
+										if (equippedWeaponID() != -1) {
+
+											//if equipped weapon is stackable, takes care of if invent weapon is stackable,
+											//isnt stackable and doesn't use ammo
+											if (itemManager.getItemComposition(equippedWeaponID()).isStackable()) {
+												equipment = rangedStrengthBonus()
+														- itemManager.getItemStats(equippedWeaponID(), false).getEquipment().getRstr()
+														+ inventoryWeaponsHashMap.get(name).strBonus;
+												//invent weapon is not stackable and uses ammo
+												if (ammoID() != -1 && !itemManager.getItemComposition(ID).isStackable() &&
+														!itemManager.getItemComposition(ID).getName().contains("rystal bow") &&
+														!itemManager.getItemComposition(ID).getName().contains("pipe")) {
+													equipment += itemManager.getItemStats(ammoID(), false).getEquipment().getRstr();
+												}
+											}
+
+											//if equipped weapon isnt stackable and uses ammo
+											//takes care of case where invent weapon is not stackable
+											else if (!itemManager.getItemComposition(equippedWeaponID()).isStackable() &&
+													ammoID() != -1
+													&& !itemManager.getItemComposition(equippedWeaponID()).getName().contains("rystal bow")
+													&& !itemManager.getItemComposition(equippedWeaponID()).getName().contains("pipe")) {
+												equipment = rangedStrengthBonus()
+														- itemManager.getItemStats(equippedWeaponID(), false).getEquipment().getRstr()
+														+ inventoryWeaponsHashMap.get(name).strBonus;
+												//invent weapon is stackable or doesnt use ammo
+												if (itemManager.getItemComposition(ID).isStackable() ||
+														name.contains("rystal bow") || name.contains("pipe")) {
+													equipment = equipment - itemManager.getItemStats(ammoID(), false).getEquipment().getRstr();
+												}
+											}
+
+											//if equipped weapon doesnt use ammo and isnt stackable
+											else if (itemManager.getItemComposition(equippedWeaponID()).getName().contains("rystal bow") ||
+													itemManager.getItemComposition(equippedWeaponID()).getName().contains("pipe")) {
+												equipment = rangedStrengthBonus()
+														- itemManager.getItemStats(equippedWeaponID(), false).getEquipment().getRstr()
+														+ itemManager.getItemStats(ID, false).getEquipment().getRstr();
+												//invent weapon isnt stackable and uses ammo
+												if (!itemManager.getItemComposition(ID).isStackable() && ammoID() != -1) {
+													equipment += itemManager.getItemStats(ammoID(), false).getEquipment().getRstr();
+												}
+											}
+										}
+
+										else {
+											equipment = rangedStrengthBonus() + inventoryWeaponsHashMap.get(name).strBonus;
+											if (itemManager.getItemComposition(ID).isStackable() ||
+													name.contains("rystal") || name.contains("pipe") & ammoID() != -1) {
+												equipment = equipment
+														- itemManager.getItemStats(ammoID(), false).getEquipment().getRstr();
+											}
+										}
+										if (prayerLevel > 1 && prayerLevel < 8) {
+											pray = 1.05;
+										} else if (prayerLevel >= 8 && prayerLevel < 26) {
+											pray = 1.1;
+										} else if (prayerLevel >= 26 && prayerLevel < 74) {
+											pray = 1.15;
+										} else if (prayerLevel >= 74 && defense >= 70) {
+											pray = 1.23;
+										}
+
+									}
+
+									//Special case: Trident
+									else if (weaponType.equals("Trident")) {
+										double maxTrident;
+
+										double magicLevel = magicLevel();
+										if (name.contains("swamp")) {
+											maxTrident = Math.floor(magicLevel / 3) - 2;
+											inventoryWeaponsHashMap.get(name).maxHitBase = Math.floor(maxTrident * magicBonus());
+											continue;
+										}
+										if (name.contains("seas")) {
+											maxTrident = Math.floor(magicLevel / 3) - 5;
+											inventoryWeaponsHashMap.get(name).maxHitBase = Math.floor(maxTrident * magicBonus());
+											continue;
+										}
+									}
+
+									//Actual calculation for base damage (base damage refers to hit without special attack)
+									double effectiveStrengthLevel = Math.floor((Math.floor(level * pray) + style + 8));
+
+
+									//Void set effects enter into calculation in effective strength level
+									if (itemSet(ID).contains("oid")) {
+										effectiveStrengthLevel = Math.floor(effectiveStrengthLevel * setBonus(weaponType, itemSet(ID)));
+									}
+
+									double baseMax = Math.floor((effectiveStrengthLevel * (equipment + 64) / 640) + 0.5);
+
+									//Non-void set effects enter into calculation after base damage calculation
+									if (!itemSet(ID).contains("oid") && !itemSet(ID).equals("No item set")) {
+										inventoryWeaponsHashMap.get(name).maxHitBase = baseMax * setBonus(weaponType, itemSet(ID));
+										continue;
+									}
+
+									inventoryWeaponsHashMap.get(name).maxHitBase = baseMax;
+
+									//Special attack
+									inventoryWeaponsHashMap.get(name).maxHitSpec = maxHitSpec(name, baseMax);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return inventoryWeaponsHashMap;
+	}
+
+
+
 	// Item sets
 	// Still need to add Inquisitor and crystal
-	public String itemSet() {
+	public String itemSet(int weaponID) {
 		final ItemContainer equipment = client.getItemContainer(InventoryID.EQUIPMENT);
 		if (equipment != null) {
 			Item[] items = equipment.getItems();
-			if (items != null && items.length >= 10) {
+			if (items != null && items.length >= 9) {
 				// IDs of relevant equipment slots
 				int bodyID = items[EquipmentInventorySlot.BODY.getSlotIdx()].getId();
 				int legsID = items[EquipmentInventorySlot.LEGS.getSlotIdx()].getId();
 				int helmID = items[EquipmentInventorySlot.HEAD.getSlotIdx()].getId();
 				int amuletID = items[EquipmentInventorySlot.AMULET.getSlotIdx()].getId();
 				int glovesID = items[EquipmentInventorySlot.GLOVES.getSlotIdx()].getId();
-				int weaponID = items[EquipmentInventorySlot.WEAPON.getSlotIdx()].getId();
 
 				//Item sets
+				//Obsidian
+				if (client.getItemDefinition(weaponID).getName().contains("xil") || client.getItemDefinition(weaponID).getName().contains("ket")) {
+					if (client.getItemDefinition(helmID).getName().contains("Obsidian") &&
+							client.getItemDefinition(bodyID).getName().contains("Obsidian") &&
+							client.getItemDefinition(legsID).getName().contains("Obsidian")) {
+						if (client.getItemDefinition(amuletID).getName().contains("serker")) {
+							return "Max obsidian";
+						}
+						return "Obsidian armor";
+					}
+					if (client.getItemDefinition(amuletID).getName().contains("serker")) {
+						return "Obsidian weapon and berserker necklace";
+					}
+				}
 				//Normal void
 				if (client.getItemDefinition(glovesID).getName().equalsIgnoreCase("Void knight gloves")) {
 					if (client.getItemDefinition(bodyID).getName().equalsIgnoreCase("Void knight top") &&
@@ -106,34 +354,23 @@ public class MaxHitPlugin extends Plugin {
 				//Dharok
 				if (client.getItemDefinition(helmID).getName().contains("harok") &&
 						client.getItemDefinition(bodyID).getName().contains("harok") &&
-						client.getItemDefinition(legsID).getName().contains("harok") &&
-						client.getItemDefinition(weaponID).getName().contains("harok")) {
-					return "Dharok";
-				}
-				//Obsidian
-				if (client.getItemDefinition(weaponID).getName().contains("xil") || client.getItemDefinition(weaponID).getName().contains("ket")) {
-					if (client.getItemDefinition(helmID).getName().contains("Obsidian") &&
-							client.getItemDefinition(bodyID).getName().contains("Obsidian") &&
-							client.getItemDefinition(legsID).getName().contains("Obsidian")) {
-						if (client.getItemDefinition(amuletID).getName().contains("serker")) {
-							return "Max obsidian";
-						}
-						return "Obsidian armor";
+						client.getItemDefinition(legsID).getName().contains("harok")) {
+					if (client.getItemDefinition(weaponID).getName().contains("harok")) {
+						return "Dharok";
 					}
-					if (client.getItemDefinition(amuletID).getName().contains("serker")) {
-						return "Obsidian weapon and berserker necklace";
-					}
+
 				}
+
 			}
 		}
 		return "No item set";
 	}
 
-	public double setBonus() {
-		String set = itemSet();
+	public double setBonus(String combatType, String set) {
+		//String set = itemSet(equippedWeaponID());
 
 		//Melee sets
-		if (combatType().equals("Melee")) {
+		if (combatType.equals("Melee")) {
 			if (set.equals("Void melee")) {
 				return 1.1;
 			}
@@ -142,6 +379,7 @@ public class MaxHitPlugin extends Plugin {
 				double currentHitpoints = client.getBoostedSkillLevel(Skill.HITPOINTS);
 				return 1 + (((baseHitpoints - currentHitpoints)/100) * baseHitpoints/100);
 			}
+
 			if (set.equals("Obsidian armor")) {
 				return 1.1;
 			}
@@ -153,7 +391,7 @@ public class MaxHitPlugin extends Plugin {
 			}
 		}
 		//Ranged sets
-		if (combatType().equals("Ranged")) {
+		if (combatType.equals("Ranged")) {
 			if (set.equals("Void range")) {
 				return 1.1;
 			}
@@ -224,6 +462,19 @@ public class MaxHitPlugin extends Plugin {
 		}
 		return "No weapon or items";
 	}
+	public int equippedWeaponID() {
+		final ItemContainer container = client.getItemContainer(InventoryID.EQUIPMENT);
+		if (container != null) {
+			Item[] items = container.getItems();
+			if (items.length >= EquipmentInventorySlot.WEAPON.getSlotIdx()) {
+				final Item weapon = items[EquipmentInventorySlot.WEAPON.getSlotIdx()];
+				if (weapon.getId() > 512) {
+					return weapon.getId();
+				}
+			}
+		}
+		return -1;
+	}
 
 
 	//Attack style (Aggressive, Defensive, etc.. Doesn't differentiate
@@ -258,6 +509,7 @@ public class MaxHitPlugin extends Plugin {
 		if (attackStyle.equalsIgnoreCase("Aggressive")) { return 3; }
 		if (attackStyle.equalsIgnoreCase("Controlled")) { return 1; }
 		if (isRangingAccurate()) { return 3; }
+		if (attackStyle.equalsIgnoreCase("Longrange")) { return 1; }
 		else { return 0; }
 	}
 
@@ -280,6 +532,7 @@ public class MaxHitPlugin extends Plugin {
 		return spell.damage;
 	}
 
+	/**Replace this with use of shieldID()**/
 	public String shieldName() {
 		final ItemContainer container = client.getItemContainer(InventoryID.EQUIPMENT);
 		if (container != null) {
@@ -293,6 +546,20 @@ public class MaxHitPlugin extends Plugin {
 			}
 		}
 		return "no shield";
+	}
+
+	public int equippedShieldID() {
+		final ItemContainer container = client.getItemContainer(InventoryID.EQUIPMENT);
+		if (container != null) {
+			Item[] items = container.getItems();
+			if (items.length >= 6) {
+				final Item shield = items[EquipmentInventorySlot.SHIELD.getSlotIdx()];
+				if (shield.getId() > 512) {
+					return shield.getId();
+				}
+			}
+		}
+		return -1;
 	}
 
 	//Magic equipment damage bonus, includes void bonus
@@ -311,7 +578,7 @@ public class MaxHitPlugin extends Plugin {
 			}
 			else { ; }
 		}
-		if (itemSet().equals("Elite void mage")) {
+		if (itemSet(equippedWeaponID()).equals("Elite void mage")) {
 			magicEquipmentBonus += 2.5;
 		}
 
@@ -353,10 +620,18 @@ public class MaxHitPlugin extends Plugin {
 		}
 		return "None";
 	}
+	public int ammoID() {
+		Item[] items = client.getItemContainer(InventoryID.EQUIPMENT).getItems();
+		if (items.length == 14) {
+			final Item ammo = items[EquipmentInventorySlot.AMMO.getSlotIdx()];
+			return ammo.getId();
+		}
+		return -1;
+	}
 
 	//Ranged equipment bonus
 	public int rangedStrengthBonus() {
-		int rangedStrengthBonus = 0;
+		int rangedStrBonus = 0;
 
 		int[] ids = client.getLocalPlayer().getPlayerComposition().getEquipmentIds();
 		for (int x : ids) {
@@ -364,7 +639,7 @@ public class MaxHitPlugin extends Plugin {
 				int id = x - 512;
 				final ItemStats stats = itemManager.getItemStats(id, false);
 				final ItemEquipmentStats currentEquipment = stats.getEquipment();
-				rangedStrengthBonus += currentEquipment.getRstr();
+				rangedStrBonus += currentEquipment.getRstr();
 			}
 			else { ; }
 		}
@@ -384,18 +659,18 @@ public class MaxHitPlugin extends Plugin {
 							final Item ammo = items[EquipmentInventorySlot.AMMO.getSlotIdx()];
 							int ammoID = ammo.getId();
 							if (ammoID != -1) {
-								//return client.getItemDefinition(ammoID).getName();
 								final ItemStats ammoStats = itemManager.getItemStats(ammoID, false);
 								final ItemEquipmentStats ammoEquipment = ammoStats.getEquipment();
-								rangedStrengthBonus += ammoEquipment.getRstr();
+								rangedStrBonus += ammoEquipment.getRstr();
 							}
 						}
 					}
 				}
 			}
 		}
-		return rangedStrengthBonus;
+		return rangedStrBonus;
 	}
+
 
 
 
@@ -439,7 +714,6 @@ public class MaxHitPlugin extends Plugin {
 				final ItemStats stats = itemManager.getItemStats(id, false);
 				final ItemEquipmentStats currentEquipment = stats.getEquipment();
 				strBonus += currentEquipment.getStr();
-
 			}
 			else { ; }
 		}
@@ -459,7 +733,7 @@ public class MaxHitPlugin extends Plugin {
 	public double maxHitBase() {
 		int style = styleBonus();
 		double pray = prayerMultiplier();
-		double setBonus = setBonus();
+		double setBonus = setBonus(combatType(), itemSet(equippedWeaponID()));
 		int equipment = 0;
 		int level = 0;
 
@@ -490,17 +764,18 @@ public class MaxHitPlugin extends Plugin {
 		double effectiveStrengthLevel = Math.floor((Math.floor(level * pray) + style + 8));
 
 		//Void set effects enter into calculation in effective strength level
-		if (itemSet().contains("oid")) {
+		if (itemSet(equippedWeaponID()).contains("oid")) {
 			effectiveStrengthLevel = Math.floor(effectiveStrengthLevel * setBonus);
 		}
 
 		double baseMax = Math.floor((effectiveStrengthLevel * (equipment + 64) / 640) + 0.5);
 
 		//Non-void set effects enter into calculation after base damage calculation
-		if (!itemSet().contains("oid")) { return baseMax * setBonus; }
+		if (!itemSet(equippedWeaponID()).contains("oid")) { return baseMax * setBonus; }
 
 		return baseMax;
 	}
+
 
 
 	//Max hit calculation for magic
@@ -522,37 +797,37 @@ public class MaxHitPlugin extends Plugin {
 	/**still need to add mage spec (nightmare staff). need to find documentation on formula**/
 	//Returns -1 if special attack does not affect max hit
 	//Displayed by "Max Special:" overlay
-	public double maxHitSpec() {
+	public double maxHitSpec(String weaponName, double maxHitBase) {
 
-		if (weaponName().contains("rossbo") && ammoName().contains("(e)")) {
+		if (weaponName.contains("rossbo") && ammoName().contains("(e)")) {
 			if (ammoName().contains("iamond")) {
-				return Math.floor(maxHitBase()) * 1.15;
+				return Math.floor(maxHitBase) * 1.15;
 			}
 			if (ammoName().contains("nyx")) {
-				return Math.floor(maxHitBase()) * 1.2;
+				return Math.floor(maxHitBase) * 1.2;
 			}
 			if (ammoName().contains("ragonstone")) {
-				return Math.floor(maxHitBase()) + Math.floor(rangedLevel() * .2);
+				return Math.floor(maxHitBase) + Math.floor(rangedLevel() * .2);
 			}
 			if (ammoName().contains("pal")) {
-				return Math.floor(maxHitBase()) + Math.floor(rangedLevel() * .1);
+				return Math.floor(maxHitBase) + Math.floor(rangedLevel() * .1);
 			}
 			if (ammoName().contains("earl")) {
-				return Math.floor(maxHitBase()) + Math.floor(rangedLevel() * .05);
+				return Math.floor(maxHitBase) + Math.floor(rangedLevel() * .05);
 			}
 		}
 
-		if (weaponName().equalsIgnoreCase("Saradomin sword")) {
-			return 16 + (Math.floor(maxHitBase()) * specialAttackDamageMultiplier(weaponName()));
+		if (weaponName.equalsIgnoreCase("Saradomin sword")) {
+			return 16 + (Math.floor(maxHitBase) * specialAttackDamageMultiplier(weaponName));
 		}
-		if (weaponName().equalsIgnoreCase("Granite hammer")) {
-			return Math.floor(maxHitBase()) + 5;
+		if (weaponName.equalsIgnoreCase("Granite hammer")) {
+			return Math.floor(maxHitBase) + 5;
 		}
-		if (specialAttackDamageMultiplier(weaponName()) != 1) {
-			if (weaponName().contains("dagger") || weaponName().equalsIgnoreCase("Dark bow")) {
-				return Math.floor(Math.floor(maxHitBase()) * specialAttackDamageMultiplier(weaponName())) * 2;
+		if (specialAttackDamageMultiplier(weaponName) != 1) {
+			if (weaponName.contains("dagger") || weaponName.equalsIgnoreCase("Dark bow")) {
+				return Math.floor(Math.floor(maxHitBase) * specialAttackDamageMultiplier(weaponName)) * 2;
 			}
-			return Math.floor(maxHitBase()) * specialAttackDamageMultiplier(weaponName());
+			return Math.floor(maxHitBase) * specialAttackDamageMultiplier(weaponName);
 		}
 
 
@@ -630,3 +905,4 @@ public class MaxHitPlugin extends Plugin {
 		return 1;
 	}
 }
+
