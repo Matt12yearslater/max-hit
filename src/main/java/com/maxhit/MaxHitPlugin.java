@@ -969,7 +969,7 @@ public class MaxHitPlugin extends Plugin {
 		// Remove void set effects
 		if (itemSet(equippedWeaponID()).contains("oid")) {
 		    reverseEffectiveStrengthLevel /= setBonus;
-        }
+        	}
 
 		final double levelNew = Math.ceil(reverseEffectiveStrengthLevel / pray);
 		final double levelDiff = levelNew - level;
