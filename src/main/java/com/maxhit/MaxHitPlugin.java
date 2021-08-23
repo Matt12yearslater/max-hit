@@ -904,5 +904,105 @@ public class MaxHitPlugin extends Plugin {
 		}
 		return 1;
 	}
+
+	public NextMaxHit nextMaxHit() {
+		NextMaxHit nextMaxHit = new NextMaxHit();
+		if (combatType().equals("Melee") || combatType().equals("Ranged") || weaponName().contains("rident")) {
+			nextMaxHit = nextMaxHitBase();
+		}
+		else if (combatType().equals("Magic")) {
+			nextMaxHit = nextMagicMaxHitBase();
+		}
+		return nextMaxHit;
+	}
+
+	private NextMaxHit nextMaxHitBase() {
+		double baseMax = maxHitBase() + 1;
+		NextMaxHit reqs = new NextMaxHit();
+
+		int style = styleBonus();
+		double pray = prayerMultiplier();
+		double setBonus = setBonus(combatType(), itemSet(equippedWeaponID()));
+		int equipment = 0;
+		int level = 0;
+
+		if (combatType().equals("Melee")) {
+			level = strengthLevel();
+			equipment = strengthBonus();
+		}
+		else if (combatType().equals("Ranged")) {
+			level = rangedLevel();
+			equipment = rangedStrengthBonus();
+		}
+		else if (weaponName().contains("rident")) {
+			final double magicLevel = magicLevel();
+			double magicLevelNew = magicLevel;
+			if (weaponName().contains("swamp")) {
+				magicLevelNew = (Math.ceil(baseMax / magicBonus()) + 2) * 3;
+			}
+			if (weaponName().contains("seas")) {
+				magicLevelNew = (Math.ceil(baseMax / magicBonus()) + 5) * 3;
+			}
+
+			final double magicDiff = magicLevelNew - magicLevel;
+
+			reqs.magicLevels = (int) magicDiff;
+
+			return reqs;
+		}
+
+		// Calculate effective strength level
+		double effectiveStrengthLevel = Math.floor((Math.floor(level * pray) + style + 8));
+		if (itemSet(equippedWeaponID()).contains("oid")) {
+			effectiveStrengthLevel = Math.floor(effectiveStrengthLevel * setBonus);
+		}
+
+		// Remove non-void set effects
+		if (!itemSet(equippedWeaponID()).contains("oid")) {
+			baseMax /= setBonus;
+		}
+
+		final double equipmentNew = Math.ceil(((baseMax - 0.5) * 640 / effectiveStrengthLevel) - 64);
+		final double equipmentDiff = equipmentNew - equipment;
+
+		double reverseEffectiveStrengthLevel = Math.ceil((baseMax - 0.5) * 640 / (equipment + 64) - 8 - style);
+		// Remove void set effects
+		if (itemSet(equippedWeaponID()).contains("oid")) {
+		    reverseEffectiveStrengthLevel /= setBonus;
+        }
+
+		final double levelNew = Math.ceil(reverseEffectiveStrengthLevel / pray);
+		final double levelDiff = levelNew - level;
+
+		final double prayerNew = reverseEffectiveStrengthLevel / level;
+		final double prayerDiff = Math.ceil((prayerNew - pray) * 100);
+
+		if (combatType().equals("Melee")) {
+			reqs.strengthBonus = (int) equipmentDiff;
+			reqs.strengthLevels = (int) levelDiff;
+		}
+		else if (combatType().equals("Ranged")) {
+			reqs.rangedBonus = (int) equipmentDiff;
+			reqs.rangedLevels = (int) levelDiff;
+		}
+		reqs.prayerBoost = (int) prayerDiff;
+
+		return reqs;
+	}
+
+	private NextMaxHit nextMagicMaxHitBase() {
+		NextMaxHit nextMaxHit = new NextMaxHit();
+
+		double base = maxMagicHitBase() + 1;
+		if (config.spellChoice().element == Element.FIRE && shieldName().contains("ome of fire")) {
+			base = Math.ceil(base / 1.5);
+		}
+		final double equipmentNew = base / spellDamage();
+		final double equipmentDiff = Math.ceil((equipmentNew - magicBonus()) * 100);
+
+		nextMaxHit.magicBonus = (int) equipmentDiff;
+
+		return nextMaxHit;
+	}
 }
 
