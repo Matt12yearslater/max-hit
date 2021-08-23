@@ -18,8 +18,8 @@ public interface MaxHitConfig extends Config {
 	@ConfigItem(
 			keyName = "showNextMaxHit",
 			name = "Calculate next max hit",
-			description = "Mouse over to show the options to reach the next max hit like " +
-					"strength/ranged levels, bonus or prayer boosts",
+			description = "Mouse over the max hit to show the options to reach the next max hit " +
+					"like strength/ranged levels, bonus or prayer boosts",
 			position = 2
 	)
 	default boolean showNextMaxHit() { return true; }
