@@ -16,10 +16,19 @@ public interface MaxHitConfig extends Config {
 	default boolean maxHit() { return true; }
 
 	@ConfigItem(
+			keyName = "showNextMaxHit",
+			name = "Calculate next max hit",
+			description = "Mouse over the max hit to show the options to reach the next max hit " +
+					"like strength/ranged levels, bonus or prayer boosts",
+			position = 2
+	)
+	default boolean showNextMaxHit() { return true; }
+
+	@ConfigItem(
 			keyName = "showSpec",
 			name = "Show Max Spec",
 			description = "Show max spec in current setup",
-			position = 2
+			position = 3
 	)
 	default boolean showSpec() { return true; }
 
@@ -27,7 +36,7 @@ public interface MaxHitConfig extends Config {
 			keyName = "showMagic",
 			name = "Show Magic",
 			description = "Show max hit in current setup with selected spell",
-			position = 3
+			position = 4
 	)
 	default boolean showMagic() { return false; }
 
@@ -36,7 +45,7 @@ public interface MaxHitConfig extends Config {
 			keyName = "spellChoice",
 			name = "Spell",
 			description = "Choose spell to calculate max",
-			position = 4
+			position = 5
 	)
 	default MagicSpell spellChoice() { return MagicSpell.ICE_BARRAGE; }
 
@@ -44,7 +53,7 @@ public interface MaxHitConfig extends Config {
 			keyName = "applyCharge",
 			name = "Apply Charge Spell",
 			description = "Calculate max hit of spell using charge (god spells)",
-			position = 5
+			position = 6
 	)
 	default boolean applyCharge() { return false; }
 
@@ -52,7 +61,7 @@ public interface MaxHitConfig extends Config {
 			keyName = "inventoryWeapons",
 			name = "Inventory Weapons' Max Hits",
 			description = "Shows max hit of weapons in inventory. Assumes highest level prayer is used",
-			position = 6
+			position = 7
 	)
 	default boolean inventoryWeapons() { return false; }
 
@@ -60,7 +69,7 @@ public interface MaxHitConfig extends Config {
 			keyName = "inventoryWeaponsSpecial",
 			name = "Inventory Weapons' Max Specs",
 			description = "Shows max spec of weapons in inventory",
-			position = 7
+			position = 8
 	)
 	default boolean invetoryWeaponsSpecial() { return false; }
 
@@ -69,7 +78,7 @@ public interface MaxHitConfig extends Config {
 			name = "Inventory Selective Spec",
 			description = "Shows spec max if weapon has spec, otherwise shows normal max. " +
 					"Do not use with previous two options",
-			position = 8
+			position = 9
 	)
 	default boolean inventorySelectiveSpecial() { return false; }
 }
