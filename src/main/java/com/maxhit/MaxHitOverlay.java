@@ -1,12 +1,10 @@
 package com.maxhit;
 
-import lombok.var;
 import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayMenuEntry;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.components.InfoBoxComponent;
 import net.runelite.client.ui.overlay.components.LineComponent;
 import net.runelite.client.ui.overlay.components.PanelComponent;
 
@@ -25,12 +23,12 @@ public class MaxHitOverlay extends Overlay {
 
     private static final Color COMBAT_LEVEL_COLOUR = new Color(0xff981f);
 
-    private MaxHitPlugin plugin;
-    private MaxHitConfig config;
-    private Client client;
-    private TooltipManager tooltipManager;
+    final private MaxHitPlugin plugin;
+    final private MaxHitConfig config;
+    final private Client client;
+    final private TooltipManager tooltipManager;
 
-    private PanelComponent panelComponent = new PanelComponent();
+    final private PanelComponent panelComponent = new PanelComponent();
 
 
     @Inject
