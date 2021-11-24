@@ -51,10 +51,10 @@ public class MaxHitOverlay extends Overlay {
         panelComponent.getChildren().clear();
 
         if (!config.displayAsInfoBox() && config.maxHit()) {
-                panelComponent.getChildren().add(LineComponent.builder()
-                        .left("Max Hit:")
-                        .right(Double.toString(Math.floor(plugin.maxHitBase())))
-                        .build());
+            panelComponent.getChildren().add(LineComponent.builder()
+                    .left("Max Hit:")
+                    .right(Double.toString(Math.floor(plugin.maxHitBase())))
+                    .build());
         }
 
         if (!config.displayAsInfoBox() && config.showSpec() && plugin.maxHitSpec(plugin.weaponName(), plugin.maxHitBase()) != -1) {
