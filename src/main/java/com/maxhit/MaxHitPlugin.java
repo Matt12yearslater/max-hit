@@ -59,7 +59,7 @@ public class MaxHitPlugin extends Plugin {
 
 	@Override
 	public void startUp() throws Exception {
-		infoBoxManager.addInfoBox(new MaxHitIndicator(ImageUtil.loadImageResource(getClass(), "strength.png"), this, config));
+		infoBoxManager.addInfoBox(new MaxHitIndicator(ImageUtil.loadImageResource(getClass(), "hitsplat.png"), this, config));
 		overlayManager.add(myOverlay);
 	}
 
