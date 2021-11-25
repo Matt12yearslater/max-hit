@@ -5,7 +5,6 @@ import static com.maxhit.AttackStyle.CASTING;
 import static com.maxhit.AttackStyle.DEFENSIVE_CASTING;
 import static com.maxhit.AttackStyle.OTHER;
 
-import com.google.common.util.concurrent.Service;
 import com.google.inject.Provides;
 import net.runelite.api.*;
 import net.runelite.client.config.ConfigManager;
@@ -14,6 +13,8 @@ import net.runelite.client.plugins.Plugin;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.ui.overlay.infobox.InfoBoxManager;
+import net.runelite.client.util.ImageUtil;
 import net.runelite.http.api.item.ItemStats;
 import net.runelite.http.api.item.ItemEquipmentStats;
 
@@ -46,6 +47,9 @@ public class MaxHitPlugin extends Plugin {
 	private MaxHitOverlay myOverlay;
 
 	@Inject
+	private InfoBoxManager infoBoxManager;
+
+	@Inject
 	private MaxHitConfig config;
 
 	@Provides
@@ -54,10 +58,16 @@ public class MaxHitPlugin extends Plugin {
 	}
 
 	@Override
-	public void startUp() throws Exception { overlayManager.add(myOverlay); }
+	public void startUp() throws Exception {
+		infoBoxManager.addInfoBox(new MaxHitIndicator(ImageUtil.loadImageResource(getClass(), "hitsplat.png"), this, config));
+		overlayManager.add(myOverlay);
+	}
 
 	@Override
-	public void shutDown() throws Exception { overlayManager.remove(myOverlay); }
+	public void shutDown() throws Exception {
+		infoBoxManager.removeIf(t -> t instanceof MaxHitIndicator);
+		overlayManager.remove(myOverlay);
+	}
 
 	//Info for all styles:
 	//Item set bonus, combat type, prayer bonus, weapon, attack style

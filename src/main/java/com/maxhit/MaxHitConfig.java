@@ -81,5 +81,13 @@ public interface MaxHitConfig extends Config {
 			position = 9
 	)
 	default boolean inventorySelectiveSpecial() { return false; }
+
+	@ConfigItem(
+			keyName = "displayAsInfoBox",
+			name = "Displays as infobox",
+			description = "Displays the max hit as an infobox",
+			position = 10
+	)
+	default boolean displayAsInfoBox() { return false; }
 }
 
