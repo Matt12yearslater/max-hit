@@ -444,6 +444,24 @@ public class MaxHitPlugin extends Plugin {
 		return 1;
 	}
 
+	//Helmet name
+	public String helmName() {
+
+		final ItemContainer container = client.getItemContainer(InventoryID.EQUIPMENT);
+		if (container != null) {
+			Item[] items = container.getItems();
+			if (items.length >= EquipmentInventorySlot.HEAD.getSlotIdx()) {
+				final Item helm = items[EquipmentInventorySlot.HEAD.getSlotIdx()];
+				if (helm.getId() > 512) {
+					int helmID = helm.getId();
+					return client.getItemDefinition(helmID).getName();
+				}
+			}
+			return "no helm";
+		}
+		return "No helm or items";
+	}
+
 
 	//Weapon name
 	public String weaponName() {
@@ -769,6 +787,9 @@ public class MaxHitPlugin extends Plugin {
 		}
 
 		double baseMax = Math.floor((effectiveStrengthLevel * (equipment + 64) / 640) + 0.5);
+
+		//Slayer helm bonus check
+		if(helmName().contains("Slayer helm") || helmName().contains("Black mask")) { baseMax = Math.floor(baseMax * 1.1667); }
 
 		//Non-void set effects enter into calculation after base damage calculation
 		if (!itemSet(equippedWeaponID()).contains("oid")) { return baseMax * setBonus; }
