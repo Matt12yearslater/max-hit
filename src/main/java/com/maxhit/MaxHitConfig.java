@@ -71,7 +71,7 @@ public interface MaxHitConfig extends Config {
 			description = "Shows max spec of weapons in inventory",
 			position = 8
 	)
-	default boolean invetoryWeaponsSpecial() { return false; }
+	default boolean inventoryWeaponsSpecial() { return false; }
 
 	@ConfigItem(
 			keyName = "inventorySelectiveSpecial",
@@ -82,4 +82,3 @@ public interface MaxHitConfig extends Config {
 	)
 	default boolean inventorySelectiveSpecial() { return false; }
 }
-
