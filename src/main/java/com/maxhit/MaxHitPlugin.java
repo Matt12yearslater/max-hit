@@ -553,7 +553,7 @@ public class MaxHitPlugin extends Plugin
 		Item[] items = container.getItems();
 		if (items.length >= EquipmentInventorySlot.WEAPON.getSlotIdx()) {
 			final Item weapon = items[EquipmentInventorySlot.WEAPON.getSlotIdx()];
-			if (weapon.getId() > 512) {
+			if (weapon.getId() > PlayerComposition.ITEM_OFFSET) {
 				int weaponID = weapon.getId();
 				return client.getItemDefinition(weaponID).getName();
 			}
@@ -588,8 +588,8 @@ public class MaxHitPlugin extends Plugin
 
 		int[] ids = client.getLocalPlayer().getPlayerComposition().getEquipmentIds();
 		for (int x : ids) {
-			if (x > 512) {
-				int id = x - 512;
+			if (x > PlayerComposition.ITEM_OFFSET) {
+				int id = x - PlayerComposition.ITEM_OFFSET;
 				final ItemStats stats = itemManager.getItemStats(id, false);
 				final ItemEquipmentStats currentEquipment = stats.getEquipment();
 				magicEquipmentBonus += currentEquipment.getMdmg();
