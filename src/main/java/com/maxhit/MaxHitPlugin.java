@@ -62,9 +62,7 @@ public class MaxHitPlugin extends Plugin
 	final int RANGED = 1;
 	final int MAGE = 2;
 	final int TRIDENT = 3;
-	@Getter
 	public ItemContainer equippedItems;
-	@Getter
 	public Item[] inventoryItems;
 	private final VoidSet voidSetChecker = new VoidSet();
 	private final EliteVoidSet eliteVoidSetChecker = new EliteVoidSet();
@@ -122,6 +120,7 @@ public class MaxHitPlugin extends Plugin
 			return;
 		}
 		inventoryItems = itemContainer.getItems();
+		map = equipableItems();
 	}
 
 	//Update on stat change
