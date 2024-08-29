@@ -1,7 +1,7 @@
 package com.maxhit;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 enum Spellbook {
     NORMAL,
