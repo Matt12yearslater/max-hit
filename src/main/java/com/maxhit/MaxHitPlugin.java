@@ -166,7 +166,6 @@ public class MaxHitPlugin extends Plugin
 			equippedItems = equipment;
 			map = equipableItems();
 		}
-
 	}
 
 	public void getEquippedItemsIds() {
