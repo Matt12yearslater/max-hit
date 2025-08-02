@@ -1,5 +1,6 @@
 package com.maxhit;
 
+import com.maxhit.calculators.NextMaxHitCalculator;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.client.ui.overlay.Overlay;
@@ -53,22 +54,14 @@ public class MaxHitOverlay extends Overlay {
         if (config.maxHit()) {
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("Max Hit:")
-                    .right(Double.toString(plugin.equipedWeaponMaxHit))
+                    .right(String.valueOf(plugin.maxHitCalculator.maxHit))
                     .build());
         }
 
-        if (config.showSpec() && plugin.maxHitSpec(plugin.weaponName(), plugin.equipedWeaponMaxHit) != -1) {
+        if (config.showSpec() && plugin.maxHitSpec(plugin.weaponName(), plugin.equippedWeaponMaxHit) != -1) {
             panelComponent.getChildren().add(LineComponent.builder()
                     .left("Max Special:")
-                    .right(Double.toString(Math.floor(plugin.maxHitSpec(plugin.weaponName(), plugin.equipedWeaponMaxHit))))
-                    .build());
-        }
-
-
-        if (config.showMagic()) {
-            panelComponent.getChildren().add(LineComponent.builder()
-                    .left("Magic Max Hit:")
-                    .right(Double.toString(Math.floor(plugin.maxMagicHitBase())))
+                    .right(Double.toString(Math.floor(plugin.maxHitSpec(plugin.weaponName(), plugin.equippedWeaponMaxHit))))
                     .build());
         }
 
@@ -120,7 +113,8 @@ public class MaxHitOverlay extends Overlay {
     }
 
     private String getNextMaxHitTooltip() {
-        NextMaxHit nextMaxHit = plugin.nextMaxHit();
+
+        NextMaxHitCalculator nextMaxHit = plugin.maxHitCalculator.maxHit;
 
         StringBuilder sb = new StringBuilder();
         sb.append(ColorUtil.wrapWithColorTag("Next max hit:", COMBAT_LEVEL_COLOUR));

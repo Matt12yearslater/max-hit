@@ -1,91 +1,79 @@
 package com.maxhit;
 
-import java.util.HashMap;
-import java.util.Map;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-enum Spellbook {
-    NORMAL,
+public enum Spellbook {
+    STANDARD,
     ANCIENT,
+    ARCEUUS,
 }
 
-enum Element {
-    AIR,
-    WATER,
-    EARTH,
-    FIRE,
-    OTHER,
-    GOD,
-    SMOKE,
-    SHADOW,
-    BLOOD,
-    ICE
-}
-
+@Getter
+@RequiredArgsConstructor
 public enum MagicSpell {
     //Most common spells
-    ICE_BARRAGE(Spellbook.ANCIENT, Element.ICE, 30),
-    BLOOD_BARRAGE(Spellbook.ANCIENT, Element.BLOOD, 29),
-    FIRE_SURGE(Spellbook.NORMAL, Element.FIRE, 24),
-    FLAMES_OF_ZAMORAK(Spellbook.NORMAL, Element.GOD, 20),
-    CLAWS_OF_GUTHIX(Spellbook.NORMAL, Element.GOD, 20),
-    SARADOMIN_STRIKE(Spellbook.NORMAL, Element.GOD, 20),
-    IBAN_BLAST(Spellbook.NORMAL, Element.OTHER, 25),
-    //Normal spells
-    EARTH_SURGE(Spellbook.NORMAL, Element.EARTH, 23),
-    WATER_SURGE(Spellbook.NORMAL, Element.WATER, 22),
-    WIND_SURGE(Spellbook.NORMAL, Element.AIR, 21),
-    FIRE_WAVE(Spellbook.NORMAL, Element.FIRE, 20),
-    EARTH_WAVE(Spellbook.NORMAL, Element.EARTH, 19),
-    WATER_WAVE(Spellbook.NORMAL, Element.WATER, 18),
-    WIND_WAVE(Spellbook.NORMAL, Element.AIR, 17),
-    FIRE_BLAST(Spellbook.NORMAL, Element.FIRE, 16),
-    EARTH_BLAST(Spellbook.NORMAL, Element.EARTH, 15),
-    WATER_BLAST(Spellbook.NORMAL, Element.WATER, 14),
-    WIND_BLAST(Spellbook.NORMAL, Element.AIR, 13),
-    FIRE_BOLT(Spellbook.NORMAL, Element.FIRE, 12),
-    EARTH_BOLT(Spellbook.NORMAL, Element.EARTH, 11),
-    WATER_BOLT(Spellbook.NORMAL, Element.WATER, 10),
-    WIND_BOLT(Spellbook.NORMAL, Element.AIR, 9),
-    FIRE_STRIKE(Spellbook.NORMAL, Element.FIRE, 8),
-    EARTH_STRIKE(Spellbook.NORMAL, Element.EARTH, 6),
-    WATER_STRIKE(Spellbook.NORMAL, Element.WATER, 4),
-    WIND_STRIKE(Spellbook.NORMAL, Element.AIR, 2),
-    //Ancient spells
-    SHADOW_BARRAGE(Spellbook.ANCIENT, Element.SHADOW, 28),
-    SMOKE_BARRAGE(Spellbook.ANCIENT, Element.SMOKE, 27),
-    ICE_BLITZ(Spellbook.ANCIENT, Element.ICE, 26),
-    BLOOD_BLITZ(Spellbook.ANCIENT, Element.BLOOD, 25),
-    SHADOW_BLITZ(Spellbook.ANCIENT, Element.SHADOW, 24),
-    SMOKE_BLITZ(Spellbook.ANCIENT, Element.SMOKE, 23),
-    ICE_BURST(Spellbook.ANCIENT, Element.ICE, 22),
-    BLOOD_BURST(Spellbook.ANCIENT, Element.BLOOD, 21),
-    SHADOW_BURST(Spellbook.ANCIENT, Element.SHADOW, 19),
-    SMOKE_BURST(Spellbook.ANCIENT, Element.SMOKE, 18),
-    ICE_RUSH(Spellbook.ANCIENT, Element.ICE, 17),
-    BLOOD_RUSH(Spellbook.ANCIENT, Element.BLOOD, 16),
-    SHADOW_RUSH(Spellbook.ANCIENT, Element.SHADOW, 15),
-    SMOKE_RUSH(Spellbook.ANCIENT, Element.SMOKE, 14),
+    ICE_BARRAGE(46, "Ice Barrage", 30, Spellbook.ANCIENT),
+    BLOOD_BARRAGE(45, "Blood Barrage", 29, Spellbook.ANCIENT),
+    SHADOW_BARRAGE(44, "Shadow Barrage", 28, Spellbook.ANCIENT),
+    SMOKE_BARRAGE(43, "Smoke Barrage", 27, Spellbook.ANCIENT),
+    ICE_BLITZ(42, "Ice Blitz", 26, Spellbook.ANCIENT),
+    BLOOD_BLITZ(41, "Blood Blitz", 25, Spellbook.ANCIENT),
+    SHADOW_BLITZ(40, "Shadow Blitz", 24, Spellbook.ANCIENT),
+    SMOKE_BLITZ(39, "Smoke Blitz", 23, Spellbook.ANCIENT),
+    ICE_BURST(38, "Ice Burst", 22, Spellbook.ANCIENT),
+    BLOOD_BURST(37, "Blood Burst", 21, Spellbook.ANCIENT),
+    SHADOW_BURST(36, "Shadow Burst", 18, Spellbook.ANCIENT),
+    SMOKE_BURST(35, "Smoke Burst", 17, Spellbook.ANCIENT),
+    ICE_RUSH(34, "Ice Rush", 16, Spellbook.ANCIENT),
+    BLOOD_RUSH(33, "Blood Rush", 15, Spellbook.ANCIENT),
+    SHADOW_RUSH(32, "Shadow Rush", 14, Spellbook.ANCIENT),
+    SMOKE_RUSH(31, "Smoke Rush", 13, Spellbook.ANCIENT),
+
+    // standard spells
+    FIRE_SURGE(51, "Fire Surge", 24, Spellbook.STANDARD),
+    EARTH_SURGE(50, "Earth Surge", 23, Spellbook.STANDARD),
+    WATER_SURGE(49, "Water Surge", 22, Spellbook.STANDARD),
+    WIND_SURGE(48, "Wind Surge", 21, Spellbook.STANDARD),
+    FIRE_WAVE(16, "Fire Wave", 20, Spellbook.STANDARD),
+    EARTH_WAVE(15, "Earth Wave", 19, Spellbook.STANDARD),
+    WATER_WAVE(14, "Water Wave", 18, Spellbook.STANDARD),
+    WIND_WAVE(13, "Wind Wave", 17, Spellbook.STANDARD),
+    FIRE_BLAST(12, "Fire Blast", 16, Spellbook.STANDARD),
+    EARTH_BLAST(11, "Earth Blast", 15, Spellbook.STANDARD),
+    WATER_BLAST(10, "Water Blast", 14, Spellbook.STANDARD),
+    WIND_BLAST(9, "Wind Blast", 13, Spellbook.STANDARD),
+    FIRE_BOLT(8, "Fire Bolt", 12, Spellbook.STANDARD),
+    EARTH_BOLT(7, "Earth Bolt", 11, Spellbook.STANDARD),
+    WATER_BOLT(6, "Water Bolt", 10, Spellbook.STANDARD),
+    WIND_BOLT(5, "Wind Bolt", 9, Spellbook.STANDARD),
+    FIRE_STRIKE(4, "Fire Strike", 8, Spellbook.STANDARD),
+    EARTH_STRIKE(3, "Earth Strike", 6, Spellbook.STANDARD),
+    WATER_STRIKE(2, "Water Strike", 4, Spellbook.STANDARD),
+    WIND_STRIKE(1, "Wind Strike", 2, Spellbook.STANDARD),
+
+    // standard but not autocast without special staff
+    FLAMES_OF_ZAMORAK(20, "Flames of Zamorak", 20, Spellbook.STANDARD),
+    CLAWS_OF_GUTHIX(19, "Claws of Guthix", 20, Spellbook.STANDARD),
+    SARADOMIN_STRIKE(52, "Saradomin Strike", 20, Spellbook.STANDARD),
+    CRUMBLE_UNDEAD(17, "Crumble Undead", 15, Spellbook.STANDARD),
+    IBAN_BLAST(47, "Iban Blast", 25, Spellbook.STANDARD),
+    MAGIC_DART(18, "Magic Dart", 10, Spellbook.STANDARD),
+
+    // arceuus
+    INFERIOR_DEMONBANE(53, "Inferior Demonbane", 16, Spellbook.ARCEUUS),
+    SUPERIOR_DEMONBANE(54, "Superior Demonbane", 23, Spellbook.ARCEUUS),
+    DARK_DEMONBANE(55, "Dark Demonbane", 30, Spellbook.ARCEUUS),
+    GHOSTLY_GRASP(56, "Ghostly Grasp", 12, Spellbook.ARCEUUS),
+    SKELETAL_GRASP(57, "Skeletal Grasp", 17, Spellbook.ARCEUUS),
+    UNDEAD_GRASP(58, "Undead Grasp", 24, Spellbook.ARCEUUS),
     ;
 
-    private static final Map<Spellbook, MagicSpell> SPELLBOOK = new HashMap<>();
-    private static final Map<Element, MagicSpell> ELEMENT = new HashMap<>();
-    private static final Map<Integer, MagicSpell> DAMAGE = new HashMap<>();
+    private final int varbValue;
 
-    static {
-        for (MagicSpell m : values()) {
-            SPELLBOOK.put(m.spellbook, m);
-            ELEMENT.put(m.element, m);
-            DAMAGE.put(m.damage, m);
-        }
-    }
+    private final String displayName;
 
-    public final Spellbook spellbook;
-    public final Element element;
-    public final int damage;
+    private final int baseMaxHit;
 
-    private MagicSpell(Spellbook spellbook, Element element, int damage) {
-        this.spellbook = spellbook;
-        this.element = element;
-        this.damage = damage;
-    }
+    private final Spellbook spellbook;
 }

@@ -1,5 +1,7 @@
 package com.maxhit.sets;
 
+import com.maxhit.styles.CombatStyle;
+
 import static net.runelite.api.ItemID.*;
 
 public class VoidSet extends EquipmentSet {
@@ -42,7 +44,7 @@ public class VoidSet extends EquipmentSet {
         };
         return isWearingSet();
     }
-    public boolean isWearingVoid(int style) {
+    public boolean isWearingVoid(CombatStyle combatStyle) {
         final int[] meleeHeads = {
                 VOID_MELEE_HELM_LOR,
                 VOID_MELEE_HELM_L,
@@ -61,9 +63,9 @@ public class VoidSet extends EquipmentSet {
                 VOID_MAGE_HELM_OR,
                 VOID_MAGE_HELM
         };
-        if (style == 0) {
+        if (combatStyle == CombatStyle.MELEE) {
             this.heads = meleeHeads;
-        } else if (style == 1) {
+        } else if (combatStyle == CombatStyle.RANGED) {
             this.heads = rangedHeads;
         } else {
             this.heads = mageHeads;
