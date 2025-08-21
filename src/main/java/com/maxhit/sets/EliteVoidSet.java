@@ -1,9 +1,12 @@
 package com.maxhit.sets;
 
+import com.maxhit.styles.CombatStyle;
+import net.runelite.api.Client;
 import static net.runelite.api.ItemID.*;
 
 public class EliteVoidSet extends VoidSet {
-    public EliteVoidSet() {
+    public EliteVoidSet(Client client) {
+        super(client);
         this.bodies = new int[]{
                 ELITE_VOID_TOP_LOR,
                 ELITE_VOID_TOP_L,
@@ -18,10 +21,7 @@ public class EliteVoidSet extends VoidSet {
         };
     }
 
-    public boolean isWearingEliteVoid() {
-        return super.isWearingVoid();
-    }
-    public boolean isWearingEliteVoid(int style) {
-        return super.isWearingVoid(style);
+    public boolean isWearingEliteVoid(CombatStyle combatStyle) {
+        return super.isWearingVoid(combatStyle);
     }
 }

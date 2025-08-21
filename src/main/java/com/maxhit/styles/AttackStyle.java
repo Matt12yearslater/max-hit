@@ -23,8 +23,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.maxhit;
+package com.maxhit.styles;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum AttackStyle
 {
     ACCURATE("Accurate"),
@@ -38,15 +43,5 @@ public enum AttackStyle
     OTHER("Other");
 
     private final String name;
-
-    AttackStyle(String name)
-    {
-        this.name = name;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
 }
 

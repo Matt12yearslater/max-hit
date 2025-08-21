@@ -1,36 +1,38 @@
 package com.maxhit.sets;
 
-import static net.runelite.api.ItemID.*;
+import net.runelite.api.Client;
+import net.runelite.api.gameval.ItemID;
 
 public class DharokSet extends EquipmentSet {
-    public DharokSet() {
+    public DharokSet(Client client) {
+        this.client = client;
         this.heads = new int[] {
-                DHAROKS_HELM,
-                DHAROKS_HELM_100,
-                DHAROKS_HELM_75,
-                DHAROKS_HELM_50,
-                DHAROKS_HELM_25,
+                ItemID.BARROWS_DHAROK_HEAD,
+                ItemID.BARROWS_DHAROK_HEAD_100,
+                ItemID.BARROWS_DHAROK_HEAD_75,
+                ItemID.BARROWS_DHAROK_HEAD_50,
+                ItemID.BARROWS_DHAROK_HEAD_25,
         };
         this.bodies = new int[] {
-                DHAROKS_PLATEBODY,
-                DHAROKS_PLATEBODY_100,
-                DHAROKS_PLATEBODY_75,
-                DHAROKS_PLATEBODY_50,
-                DHAROKS_PLATEBODY_25,
+                ItemID.BARROWS_DHAROK_BODY,
+                ItemID.BARROWS_DHAROK_BODY_100,
+                ItemID.BARROWS_DHAROK_BODY_75,
+                ItemID.BARROWS_DHAROK_BODY_50,
+                ItemID.BARROWS_DHAROK_BODY_25,
         };
         this.legs = new int[] {
-                DHAROKS_PLATELEGS,
-                DHAROKS_PLATELEGS_100,
-                DHAROKS_PLATELEGS_75,
-                DHAROKS_PLATELEGS_50,
-                DHAROKS_PLATELEGS_25,
+                ItemID.BARROWS_DHAROK_LEGS,
+                ItemID.BARROWS_DHAROK_LEGS_100,
+                ItemID.BARROWS_DHAROK_LEGS_75,
+                ItemID.BARROWS_DHAROK_LEGS_50,
+                ItemID.BARROWS_DHAROK_LEGS_25,
         };
         this.weapons = new int[] {
-                DHAROKS_GREATAXE,
-                DHAROKS_GREATAXE_100,
-                DHAROKS_GREATAXE_75,
-                DHAROKS_GREATAXE_50,
-                DHAROKS_GREATAXE_25,
+                 ItemID.BARROWS_DHAROK_WEAPON,
+                 ItemID.BARROWS_DHAROK_WEAPON_100,
+                 ItemID.BARROWS_DHAROK_WEAPON_75,
+                 ItemID.BARROWS_DHAROK_WEAPON_50,
+                 ItemID.BARROWS_DHAROK_WEAPON_25,
         };
     }
 }

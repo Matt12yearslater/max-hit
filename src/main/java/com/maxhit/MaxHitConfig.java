@@ -26,36 +26,11 @@ public interface MaxHitConfig extends Config {
 
 	@ConfigItem(
 			keyName = "showSpec",
-			name = "Show Max Spec",
-			description = "Show max spec in current setup",
+			name = "Show Special Attack Max hit",
+			description = "Show special attack max hit",
 			position = 3
 	)
 	default boolean showSpec() { return true; }
-
-	@ConfigItem(
-			keyName = "showMagic",
-			name = "Show Magic",
-			description = "Show max hit in current setup with selected spell",
-			position = 4
-	)
-	default boolean showMagic() { return false; }
-
-
-	@ConfigItem(
-			keyName = "spellChoice",
-			name = "Spell",
-			description = "Choose spell to calculate max",
-			position = 5
-	)
-	default MagicSpell spellChoice() { return MagicSpell.ICE_BARRAGE; }
-
-	@ConfigItem(
-			keyName = "applyCharge",
-			name = "Apply Charge Spell",
-			description = "Calculate max hit of spell using charge (god spells)",
-			position = 6
-	)
-	default boolean applyCharge() { return false; }
 
 	@ConfigItem(
 			keyName = "inventoryWeapons",

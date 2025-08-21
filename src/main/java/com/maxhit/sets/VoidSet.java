@@ -1,69 +1,37 @@
 package com.maxhit.sets;
 
-import static net.runelite.api.ItemID.*;
+import com.maxhit.styles.CombatStyle;
+import net.runelite.api.Client;
+import net.runelite.api.gameval.ItemID;
 
 public class VoidSet extends EquipmentSet {
 
-    public VoidSet() {
+    public VoidSet(Client client) {
+        this.client = client;
         this.bodies = new int[]{
-                VOID_KNIGHT_TOP_LOR,
-                VOID_KNIGHT_TOP_L,
-                VOID_KNIGHT_TOP_OR,
-                VOID_KNIGHT_TOP
+                ItemID.PEST_VOID_KNIGHT_TOP,
         };
         this.legs = new int[]{
-                VOID_KNIGHT_ROBE_LOR,
-                VOID_KNIGHT_ROBE_L,
-                VOID_KNIGHT_ROBE_OR,
-                VOID_KNIGHT_ROBE
+                ItemID.PEST_VOID_KNIGHT_ROBES,
         };
         this.gloves = new int[]{
-                VOID_MELEE_HELM_LOR,
-                VOID_MELEE_HELM_L,
-                VOID_MELEE_HELM_OR,
-                VOID_MELEE_HELM
+                ItemID.PEST_VOID_KNIGHT_GLOVES,
         };
     }
 
-    public boolean isWearingVoid() {
-        this.heads = new int [] {
-                VOID_MELEE_HELM_LOR,
-                VOID_MELEE_HELM_L,
-                VOID_MELEE_HELM_OR,
-                VOID_MELEE_HELM,
-                VOID_RANGER_HELM_LOR,
-                VOID_RANGER_HELM_L,
-                VOID_RANGER_HELM_OR,
-                VOID_RANGER_HELM,
-                VOID_MAGE_HELM_LOR,
-                VOID_MAGE_HELM_L,
-                VOID_MAGE_HELM_OR,
-                VOID_MAGE_HELM
-        };
-        return isWearingSet();
-    }
-    public boolean isWearingVoid(int style) {
+    public boolean isWearingVoid(CombatStyle combatStyle) {
         final int[] meleeHeads = {
-                VOID_MELEE_HELM_LOR,
-                VOID_MELEE_HELM_L,
-                VOID_MELEE_HELM_OR,
-                VOID_MELEE_HELM
+                ItemID.GAME_PEST_MELEE_HELM,
         };
         final int[] rangedHeads = {
-                VOID_RANGER_HELM_LOR,
-                VOID_RANGER_HELM_L,
-                VOID_RANGER_HELM_OR,
-                VOID_RANGER_HELM
+                ItemID.GAME_PEST_ARCHER_HELM,
         };
         final int[] mageHeads = {
-                VOID_MAGE_HELM_LOR,
-                VOID_MAGE_HELM_L,
-                VOID_MAGE_HELM_OR,
-                VOID_MAGE_HELM
+                ItemID.GAME_PEST_MAGE_HELM,
         };
-        if (style == 0) {
+        if (combatStyle == CombatStyle.MELEE) {
             this.heads = meleeHeads;
-        } else if (style == 1) {
+        } else if (combatStyle == CombatStyle.RANGED) {
             this.heads = rangedHeads;
         } else {
             this.heads = mageHeads;

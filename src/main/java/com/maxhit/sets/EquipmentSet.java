@@ -4,14 +4,14 @@ package com.maxhit.sets;
 
 import net.runelite.api.Client;
 import net.runelite.api.EquipmentInventorySlot;
-import net.runelite.api.InventoryID;
+import net.runelite.api.ItemContainer;
 import net.runelite.api.Item;
-
+import net.runelite.api.gameval.InventoryID;
 import javax.inject.Inject;
 
 public class EquipmentSet {
     @Inject
-    private Client client;
+    protected Client client;
     protected int[] heads = null;
     protected int[] bodies = null;
     protected int[] legs = null;
@@ -19,20 +19,17 @@ public class EquipmentSet {
     protected int[] weapons = null;
 
     protected boolean hasItem(int[] items, EquipmentInventorySlot slot) {
-        try {
-            Item[] equippedItems = client.getItemContainer(InventoryID.EQUIPMENT).getItems();
-            if (items == null) {
+        ItemContainer container = client.getItemContainer(InventoryID.WORN);
+        if (container == null)
+            return false;
+        Item[] equippedItems = container.getItems();
+
+        for (int item : items) {
+            if (equippedItems[slot.getSlotIdx()].getId() == item) {
                 return true;
             }
-            for (int item : items) {
-                if (equippedItems[slot.getSlotIdx()].getId() == item) {
-                    return true;
-                }
-            }
-            return false;
-        } catch (NullPointerException e) {
-            return false;
         }
+        return false;
     }
 
     private boolean hasHead() {
