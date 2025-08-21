@@ -1,44 +1,66 @@
 package com.maxhit.calculators;
 
 import com.maxhit.equipment.EquipmentFunctions;
-import com.maxhit.equipment.SpecialAttackWeapons;
-import com.maxhit.stats.Stats;
+import com.maxhit.equipment.SpecialAttackWeapon;
+import lombok.Setter;
 import net.runelite.api.Client;
+import net.runelite.api.EquipmentInventorySlot;
+import net.runelite.api.Item;
+import net.runelite.api.ItemContainer;
+import net.runelite.api.Skill;
 
 public class SpecialAttackCalculator
 {
-    private Client client;
+	private Client client;
+	@Setter
+	private ItemContainer equippedItems;
 
-    public SpecialAttackCalculator(Client client)
-    {
-        this.client = client;
-    }
+	public SpecialAttackCalculator(Client client)
+	{
+		this.client = client;
+	}
 
-    public double maxHitSpec(int weaponId, double maxHitBase) {
-        String weaponName = client.getItemDefinition(weaponId).getName();
-        double damageMultiplier = SpecialAttackWeapons.WeaponMap.get(weaponId);
-        String ammoName = EquipmentFunctions.getAmmoName(equippedItems, client);
-        if (weaponName.contains("rossbo") && ammoName.contains("(e)")) {
-            int playerRangedLevel = Stats.RANGED.getValue(client);
-            if (ammoName.contains("Diamond")) return Math.floor(maxHitBase) * 1.15;
-            if (ammoName.contains("Onyx")) return Math.floor(maxHitBase) * 1.2;
-            if (ammoName.contains("Dragonstone")) return Math.floor(maxHitBase) + Math.floor(playerRangedLevel * .2);
-            if (ammoName.contains("Opal")) return Math.floor(maxHitBase) + Math.floor(playerRangedLevel * .1);
-            if (ammoName.contains("Pearl")) return Math.floor(maxHitBase) + Math.floor(playerRangedLevel * .05);
-        }
+	public double getSpecialMaxHit(double maxHitBase)
+	{
+		Item weapon = equippedItems.getItem(EquipmentInventorySlot.WEAPON.getSlotIdx());
+		if (weapon == null)
+		{
+			return maxHitBase;
+		}
+		String weaponName = EquipmentFunctions.GetEquippedItemString(client, equippedItems, EquipmentInventorySlot.WEAPON);
+		for (SpecialAttackWeapon specialAttackWeapon : SpecialAttackWeapon.values())
+		{
+			if (specialAttackWeapon.getItemId() == weapon.getId())
+			{
+				return specialAttackWeapon.getSpecialAttackDamage(client, maxHitBase);
+			}
+		}
 
-        if (weaponName.equalsIgnoreCase("Saradomin sword")) {
-            return 16 + (Math.floor(maxHitBase) * SpecialAttackWeapons.WeaponMap.get(weaponId));
-        }
-        if (weaponName.equalsIgnoreCase("Granite hammer")) {
-            return Math.floor(maxHitBase) + 5;
-        }
-        if (damageMultiplier != -1) {
-            if (weaponName.contains("dagger") || weaponName.equalsIgnoreCase("Dark bow")) {
-                return Math.floor(Math.floor(maxHitBase) * damageMultiplier) * 2;
-            }
-            return Math.floor(maxHitBase) * damageMultiplier;
-        }
-        return -1;
-    }
+		String ammoName = EquipmentFunctions.GetEquippedItemString(client, equippedItems, EquipmentInventorySlot.AMMO);
+		if (weaponName.contains("rossbo") && ammoName.contains("(e)"))
+		{
+			int playerRangedLevel = client.getBoostedSkillLevel(Skill.RANGED);
+			if (ammoName.contains("Diamond"))
+			{
+				return Math.floor(maxHitBase) * 1.15;
+			}
+			if (ammoName.contains("Onyx"))
+			{
+				return Math.floor(maxHitBase) * 1.2;
+			}
+			if (ammoName.contains("Dragonstone"))
+			{
+				return Math.floor(maxHitBase) + Math.floor(playerRangedLevel * 0.2);
+			}
+			if (ammoName.contains("Opal"))
+			{
+				return Math.floor(maxHitBase) + Math.floor(playerRangedLevel * 0.1);
+			}
+			if (ammoName.contains("Pearl"))
+			{
+				return Math.floor(maxHitBase) + Math.floor(playerRangedLevel * .05);
+			}
+		}
+		return maxHitBase;
+	}
 }

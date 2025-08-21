@@ -1,5 +1,6 @@
 package com.maxhit.sets;
 
+import net.runelite.api.Client;
 import net.runelite.api.EquipmentInventorySlot;
 
 import static net.runelite.api.ItemID.*;
@@ -11,7 +12,8 @@ public class ObsidianSet extends EquipmentSet {
             BERSERKER_NECKLACE_OR
     };
     // This does not include the amulet
-    public ObsidianSet() {
+    public ObsidianSet(Client client) {
+        this.client = client;
         this.heads = new int[] {
                 OBSIDIAN_HELMET
         };

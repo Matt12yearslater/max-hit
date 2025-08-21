@@ -1,34 +1,41 @@
 package com.maxhit.equipment;
 
-import com.maxhit.styles.AttackStyle;
-import net.runelite.api.*;
-import net.runelite.api.gameval.InventoryID;
+import javax.annotation.Nonnull;
+import net.runelite.api.Item;
+import net.runelite.api.Client;
+import net.runelite.api.ItemContainer;
+import net.runelite.api.EquipmentInventorySlot;
 
-public class EquipmentFunctions {
 
+public class EquipmentFunctions
+{
 
-    public static String getAmmoName(ItemContainer equipment, Client client) {
-        final Item ammo = equipment.getItem(EquipmentInventorySlot.AMMO.getSlotIdx());
-        if (ammo == null) return  null;
-        int ammoID = ammo.getId();
-        if (ammoID != -1) {
-            return client.getItemDefinition(ammoID).getName();
-        }
-        return null;
-    }
+	public static boolean HasEquipped(ItemContainer equippedItems, EquipmentInventorySlot slot, int itemID)
+	{
+		if (equippedItems == null)
+		{
+			return false;
+		}
+		Item equippedItem = equippedItems.getItem(slot.ordinal());
+		if (equippedItem == null)
+		{
+			return false;
+		}
+		return equippedItem.getId() == itemID;
+	}
 
-    public static String getWeaponName(Client client) {
-
-        final ItemContainer container = client.getItemContainer(InventoryID.WORN);
-        if (container == null) return null;
-        Item[] items = container.getItems();
-        if (items.length >= EquipmentInventorySlot.WEAPON.getSlotIdx()) {
-            final Item weapon = items[EquipmentInventorySlot.WEAPON.getSlotIdx()];
-            if (weapon.getId() > 512) {
-                int weaponID = weapon.getId();
-                return client.getItemDefinition(weaponID).getName();
-            }
-        }
-        return null;
-    }
+	@Nonnull
+	public static String GetEquippedItemString(Client client, ItemContainer equippedItems, EquipmentInventorySlot slot)
+	{
+		if (equippedItems == null)
+		{
+			return "";
+		}
+		Item equippedItem = equippedItems.getItem(slot.getSlotIdx());
+		if (equippedItem == null)
+		{
+			return "";
+		}
+		return client.getItemDefinition(equippedItem.getId()).getName();
+	}
 }

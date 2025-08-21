@@ -1,21 +1,29 @@
 package com.maxhit.styles;
 
+import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.EnumID;
 import net.runelite.api.ParamID;
 import net.runelite.api.StructComposition;
+import lombok.extern.slf4j.Slf4j;
 
 import static com.maxhit.styles.AttackStyle.OTHER;
 
+@Slf4j
+@Setter
 public class StyleFactory {
 
     private final Client client;
-    private CombatStyle combatStyle;
-    private AttackStyle attackStyle;
+    private int currentComMode;
+    private int currentWeaponCategory;
+    private int currentCastingMode;
 
     public StyleFactory(Client client)
     {
         this.client = client;
+        currentComMode = -1;
+        currentWeaponCategory = -1;
+        currentCastingMode = -1;
     }
 
     private AttackStyle[] getWeaponTypeStyles(int weaponType)
@@ -80,36 +88,37 @@ public class StyleFactory {
         return styles;
     }
 
-    public AttackStyle getAttackStyle(Client client, int equippedWeaponType, int attackStyleIndex, int castingMode)
+    public AttackStyle getAttackStyle(Client client)
     {
-        AttackStyle[] attackStyles = getWeaponTypeStyles(equippedWeaponType);
+        int styleIndex = currentComMode;
+        AttackStyle[] attackStyles = getWeaponTypeStyles(currentWeaponCategory);
         AttackStyle attackStyle = null;
-        if (attackStyleIndex < attackStyles.length)
+        if (currentComMode < attackStyles.length)
         {
             // from script4525
             // Even though the client has 5 attack styles for Staffs, only attack styles 0-4 are used, with an additional
             // casting mode set for defensive casting
-            if (attackStyleIndex == 4)
-            {
-                attackStyleIndex += castingMode;
-            }
+            if (currentComMode == 4)
+                styleIndex += currentCastingMode;
 
-            attackStyle = attackStyles[attackStyleIndex];
-            if (attackStyle == null)
-            {
-                attackStyle = OTHER;
-            }
+            attackStyle = attackStyles[styleIndex];
+
         }
-
+        if (attackStyle == null)
+            attackStyle = OTHER;
         return attackStyle;
     }
 
     //Combat type of equipped weapon (Melee, ranged, magic, other)
     public CombatStyle getCombatType(AttackStyle attackStyle) {
-        if (attackStyle == AttackStyle.ACCURATE || attackStyle == AttackStyle.AGGRESSIVE ||
-                attackStyle == AttackStyle.CONTROLLED || attackStyle == AttackStyle.DEFENSIVE) return CombatStyle.MELEE;
+        if (attackStyle == AttackStyle.ACCURATE ||
+                attackStyle == AttackStyle.AGGRESSIVE ||
+                attackStyle == AttackStyle.CONTROLLED ||
+                attackStyle == AttackStyle.DEFENSIVE)
+            return CombatStyle.MELEE;
         if (attackStyle.getName().contains("ang")) return CombatStyle.RANGED;
         if (attackStyle.getName().contains("Casting")) return CombatStyle.MAGE;
+        log.debug("Null combat stlye: {}", attackStyle.getName());
         return null;
     }
 }

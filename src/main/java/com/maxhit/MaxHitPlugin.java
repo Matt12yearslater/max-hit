@@ -1,54 +1,59 @@
 package com.maxhit;
 
-
-import com.google.common.collect.ImmutableSet;
+import com.maxhit.calculators.SpecialAttackCalculator;
+import java.time.Duration;
+import java.time.Instant;
+import javax.inject.Inject;
+import java.util.HashMap;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import com.google.inject.Provides;
-import com.maxhit.calculators.MaxHitCalculator;
-import com.maxhit.calculators.MaxHitCalculatorFactory;
-import com.maxhit.sets.EliteVoidSet;
-import com.maxhit.stats.Stats;
-import com.maxhit.styles.AttackStyle;
-import com.maxhit.styles.StyleFactory;
-import com.maxhit.styles.CombatStyle;
 import net.runelite.api.Client;
-import net.runelite.api.Item;
 import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.GameState;
-import net.runelite.api.Skill;
+import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
-import net.runelite.api.gameval.InventoryID;
-import net.runelite.api.gameval.ItemID;
-import net.runelite.api.gameval.VarPlayerID;
+import net.runelite.api.Skill;
+import net.runelite.api.Actor;
+import net.runelite.api.Hitsplat;
+import net.runelite.api.NPC;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.api.events.StatChanged;
 import net.runelite.api.events.VarbitChanged;
+import net.runelite.api.events.HitsplatApplied;
+import net.runelite.api.gameval.InventoryID;
+import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.client.callback.ClientThread;
-import net.runelite.client.game.ItemStats;
-import net.runelite.client.game.ItemEquipmentStats;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
-import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
+import com.maxhit.calculators.MaxHitCalculator;
+import com.maxhit.calculators.MaxHitCalculatorFactory;
+import com.maxhit.styles.AttackStyle;
+import com.maxhit.styles.StyleFactory;
+import com.maxhit.styles.CombatStyle;
 
-import javax.inject.Inject;
-import java.util.Set;
-import java.util.HashMap;
 
 @Slf4j
 @PluginDescriptor(
-		name = "Max Hit",
-		description = "Displays current max hit",
-		enabledByDefault = true,
-		tags = {"max, hit, spec, pvp, magic, spell, combat"}
+	name = "Max Hit",
+	description = "Displays current max hit",
+	enabledByDefault = true,
+	tags = {"max, hit, spec, pvp, magic, spell, combat, gear"}
 )
 
 
 public class MaxHitPlugin extends Plugin
 {
+
+	private static final int WEAPON_SPECIAL_REQS = 906;
+	private static final Duration WAIT = Duration.ofSeconds(5);
+
 	@Inject
 	private Client client;
 	@Inject
@@ -68,70 +73,97 @@ public class MaxHitPlugin extends Plugin
 		return configManager.getConfig(MaxHitConfig.class);
 	}
 
-	CombatStyle combatStyle;
-	StyleFactory styleFactory;
-	public Item[] inventoryItems;
-	public ItemContainer equippedItems;
-	public MaxHitCalculator maxHitCalculator;
-	private final MaxHitCalculatorFactory maxHitCalculatorFactory = new MaxHitCalculatorFactory(client, itemManager);
-	public static int booleanToInt(boolean value) { return value ? 1 : 0;}
-  	private final HashMap<String, Integer> equippedItemIds = new HashMap<String, Integer>();
-	private final HashMap<String, InventoryWeapon> inventoryWeaponsHashMap = new HashMap<>();
+	private Instant lastTime;
+	private ItemContainer equippedItems;
+	private StyleFactory styleFactory;
+	private MaxHitCalculatorFactory maxHitCalculatorFactory;
+	@Getter
+	private MaxHitCalculator maxHitCalculator;
+	@Getter
+	private SpecialAttackCalculator specialAttackCalculator;
+	//Might be better to break this out into own class
+	@Getter
+	private boolean isWieldingSpecialAttackWeapon = false;
+	@Getter
 	public HashMap<String, InventoryWeapon> map;
-	private AttackStyle attackStyle;
 
 	@Override
-	public void startUp() throws Exception {
+	public void startUp() throws Exception
+	{
 		overlayManager.add(myOverlay);
-
-		if (client.getGameState() == GameState.LOGGED_IN)
+		clientThread.invokeLater(() ->
 		{
-			clientThread.invoke(this::start);
-		}
-	}
+			styleFactory = new StyleFactory(client);
+			maxHitCalculatorFactory = new MaxHitCalculatorFactory(client, itemManager);
+			specialAttackCalculator = new SpecialAttackCalculator(client);
+			if (!client.getGameState().equals(GameState.LOGGED_IN))
+			{
+				return;
+			}
 
+			equippedItems = client.getItemContainer(InventoryID.WORN);
+			if (equippedItems == null)
+			{
+				return;
+			}
+			// Safe to assume combat Varbits have been set here?
+			getMaxHit();
 
-	private void start() {
-
-		int currentAttackStyleVarbit = client.getVarpValue(VarPlayerID.COM_MODE);
-		int currentEquippedWeaponTypeVarbit = client.getVarbitValue(VarbitID.COMBAT_WEAPON_CATEGORY);
-		int currentCastingModeVarbit = client.getVarbitValue(VarbitID.AUTOCAST_DEFMODE);
-		styleFactory = new StyleFactory(client);
-		attackStyle = styleFactory.getAttackStyle(client, currentEquippedWeaponTypeVarbit, currentAttackStyleVarbit,
-				currentCastingModeVarbit);
-		combatStyle = styleFactory.getCombatType(attackStyle);
-		maxHitCalculator = maxHitCalculatorFactory.create(combatStyle);
+		});
 	}
 
 	@Override
-	public void shutDown() throws Exception {
+	public void shutDown() throws Exception
+	{
 		overlayManager.remove(myOverlay);
-		equippedItems = null;
-		inventoryItems = null;
+		lastTime = null;
+		isWieldingSpecialAttackWeapon = false;
+		styleFactory = null;
+		maxHitCalculatorFactory = null;
+		specialAttackCalculator = null;
+		maxHitCalculator = null;
 	}
 
 	@Subscribe
-	public void onItemContainerChanged(final ItemContainerChanged event) {
-		final ItemContainer itemContainer = event.getItemContainer();
+	public void onItemContainerChanged(final ItemContainerChanged event)
+	{
 		//If equipment is changed, recalculate
-		if (event.getContainerId() == InventoryID.WORN) {
-			maxHitCalculator.setEquippedItems(itemContainer);
+		if (event.getItemContainer() != client.getItemContainer(InventoryID.WORN))
+		{
+			return;
 		}
+
+		if (maxHitCalculator == null)
+		{
+			return;
+		}
+		equippedItems = event.getItemContainer();
+		maxHitCalculator.setEquippedItems(equippedItems);
+		maxHitCalculator.CalculateMaxHit();
+		specialAttackCalculator.setEquippedItems(equippedItems);
+		checkIsWieldingSpecialAttackWeapon();
 	}
 
 	//Update on stat change
 	@Subscribe
 	public void onStatChanged(StatChanged event)
 	{
-		Skill[] skills = {
-				Skill.STRENGTH, Skill.RANGED, Skill.MAGIC, Skill.HITPOINTS
-		};
-		for (Skill skill: skills)
+		// Called upon XP gain, level gained, or boosted level gained
+		// Question is, should this be called every time i.e. every attack or just upon level up?
+		if (maxHitCalculator == null)
 		{
-			if(event.getSkill() != skill) {
+			return;
+		}
+		Skill[] skills = {
+			Skill.STRENGTH, Skill.RANGED, Skill.MAGIC, Skill.HITPOINTS
+		};
+		for (Skill skill : skills)
+		{
+			if (event.getSkill() != maxHitCalculator.getSkill())
+			{
 				continue;
 			}
-			maxHitCalculator.statUpdated();
+			maxHitCalculator.CalculateMaxHit();
 			return;
 		}
 	}
@@ -142,18 +174,91 @@ public class MaxHitPlugin extends Plugin
 		// COM_MODE = Attack Style
 		// COMBAT_WEAPON_CATEGORY = Weapon Style
 		if (event.getVarpId() == VarPlayerID.COM_MODE
-				|| event.getVarbitId() == VarbitID.COMBAT_WEAPON_CATEGORY
-				|| event.getVarbitId() == VarbitID.AUTOCAST_DEFMODE)
+			|| event.getVarbitId() == VarPlayerID.COM_STANCE
+			|| event.getVarbitId() == VarbitID.COMBAT_WEAPON_CATEGORY
+			|| event.getVarbitId() == VarbitID.AUTOCAST_DEFMODE)
 		{
-			final int currentAttackStyleVarbit = client.getVarpValue(VarPlayerID.COM_MODE);
-			final int currentEquippedWeaponTypeVarbit = client.getVarbitValue(VarbitID.COMBAT_WEAPON_CATEGORY);
-			final int currentCastingModeVarbit = client.getVarbitValue(VarbitID.AUTOCAST_DEFMODE);
-
-			attackStyle = styleFactory.getAttackStyle(client, currentEquippedWeaponTypeVarbit, currentAttackStyleVarbit,
-					currentCastingModeVarbit);
-
+			getMaxHit();
+		}
+		else if (event.getVarbitId() == VarbitID.AUTOCAST_SPELL ||
+				 event.getVarbitId() == VarbitID.PRAYER_ALLACTIVE)
+		{
+			maxHitCalculator.CalculateMaxHit();
 		}
 	}
 
+	@Subscribe
+	public void onGameTick(GameTick gameTick)
+	{
+		if (maxHitCalculator.opponent  != null
+			&& lastTime != null
+			&& client.getLocalPlayer().getInteracting() == null)
+		{
+			if (Duration.between(lastTime, Instant.now()).compareTo(WAIT) > 0)
+			{
+				maxHitCalculator.opponent  = null;
+				maxHitCalculator.CalculateMaxHit();
+			}
+		}
+	}
 
+	@Subscribe
+	public void onHitsplatApplied(HitsplatApplied hitsplatApplied)
+	{
+		if (maxHitCalculator == null)
+		{
+			return;
+		}
+		Actor actor = hitsplatApplied.getActor();
+		Hitsplat hitsplat = hitsplatApplied.getHitsplat();
+		if (actor == null)
+		{
+			return;
+		}
+		if (!(actor instanceof NPC))
+		{
+			return;
+		}
+		if (hitsplat.isOthers())
+		{
+			return;
+		}
+		lastTime = Instant.now();
+		maxHitCalculator.opponent = actor;
+		maxHitCalculator.CalculateMaxHit();
+
+	}
+
+	private void getMaxHit()
+	{
+		styleFactory.setCurrentComMode(client.getVarpValue(VarPlayerID.COM_MODE));
+		styleFactory.setCurrentWeaponCategory(client.getVarbitValue(VarbitID.COMBAT_WEAPON_CATEGORY));
+		styleFactory.setCurrentCastingMode(client.getVarbitValue(VarbitID.AUTOCAST_DEFMODE));
+
+		AttackStyle attackStyle = styleFactory.getAttackStyle(client);
+		if (attackStyle == null || attackStyle == AttackStyle.OTHER)
+		{
+			return;
+		}
+
+		CombatStyle combatStyle = styleFactory.getCombatType(attackStyle);
+		maxHitCalculator = maxHitCalculatorFactory.create(combatStyle, attackStyle);
+		maxHitCalculator.CalculateMaxHit();
+	}
+
+	private void checkIsWieldingSpecialAttackWeapon()
+	{
+		if (equippedItems == null)
+		{
+			log.debug("Equipped items null");
+			return;
+		}
+		Item weapon = equippedItems.getItem(EquipmentInventorySlot.WEAPON.getSlotIdx());
+		if (weapon == null)
+		{
+			log.debug("Weapon null");
+			return;
+		}
+		isWieldingSpecialAttackWeapon = client.getEnum(WEAPON_SPECIAL_REQS).getIntValue(weapon.getId()) > 0;
+	}
 }
