@@ -87,50 +87,6 @@ public class MaxHitOverlay extends Overlay
 			tooltipManager.add(new Tooltip(getNextMaxHitTooltip()));
 		}
 
-		if (plugin.map == null)
-		{
-			return panelComponent.render(graphics);
-		}
-
-		for (Object weapon : plugin.map.keySet())
-		{
-			String wep = weapon.toString();
-			if (config.inventoryWeapons())
-			{
-				panelComponent.getChildren().add(LineComponent.builder()
-					.left(plugin.map.get(wep).name)
-					.right(Double.toString(Math.floor(plugin.map.get(wep).maxHitBase)))
-					.build());
-			}
-			if (plugin.map.get(wep).maxHitSpec > 0 && config.inventoryWeaponsSpecial())
-			{
-				panelComponent.getChildren().add(LineComponent.builder()
-					.left(plugin.map.get(wep).name + " Spec")
-					.right(Double.toString(Math.floor(plugin.map.get(wep).maxHitSpec)))
-					.build());
-			}
-			if (config.inventorySelectiveSpecial() &&
-				!config.inventoryWeapons() &&
-				!config.inventoryWeaponsSpecial())
-			{
-
-				if (plugin.map.get(wep).maxHitSpec <= 0)
-				{
-					panelComponent.getChildren().add(LineComponent.builder()
-						.left(plugin.map.get(wep).name)
-						.right(Double.toString(Math.floor(plugin.map.get(wep).maxHitBase)))
-						.build());
-				}
-				else
-				{
-					panelComponent.getChildren().add(LineComponent.builder()
-						.left(plugin.map.get(wep).name + " Spec")
-						.right(Double.toString(Math.floor(plugin.map.get(wep).maxHitSpec)))
-						.build());
-				}
-			}
-		}
-
 		return panelComponent.render(graphics);
 	}
 

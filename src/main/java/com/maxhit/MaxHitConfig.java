@@ -31,29 +31,4 @@ public interface MaxHitConfig extends Config {
 			position = 3
 	)
 	default boolean showSpec() { return true; }
-
-	@ConfigItem(
-			keyName = "inventoryWeapons",
-			name = "Inventory Weapons' Max Hits",
-			description = "Shows max hit of weapons in inventory. Assumes highest level prayer is used",
-			position = 7
-	)
-	default boolean inventoryWeapons() { return false; }
-
-	@ConfigItem(
-			keyName = "inventoryWeaponsSpecial",
-			name = "Inventory Weapons' Max Specs",
-			description = "Shows max spec of weapons in inventory",
-			position = 8
-	)
-	default boolean inventoryWeaponsSpecial() { return false; }
-
-	@ConfigItem(
-			keyName = "inventorySelectiveSpecial",
-			name = "Inventory Selective Spec",
-			description = "Shows spec max if weapon has spec, otherwise shows normal max. " +
-					"Do not use with previous two options",
-			position = 9
-	)
-	default boolean inventorySelectiveSpecial() { return false; }
 }
