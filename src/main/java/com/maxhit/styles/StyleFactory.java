@@ -6,37 +6,44 @@ import net.runelite.api.EnumID;
 import net.runelite.api.ParamID;
 import net.runelite.api.StructComposition;
 import lombok.extern.slf4j.Slf4j;
-
 import static com.maxhit.styles.AttackStyle.OTHER;
+import net.runelite.api.gameval.VarPlayerID;
+import net.runelite.api.gameval.VarbitID;
 
 @Slf4j
 @Setter
 public class StyleFactory {
 
-    private final Client client;
-    private int currentComMode;
-    private int currentWeaponCategory;
-    private int currentCastingMode;
+	public static AttackType getAttackType(Client client)
+	{
+		int comMode = client.getVarpValue(VarPlayerID.COM_MODE);
+		int weaponCategory = client.getVarbitValue(VarbitID.COMBAT_WEAPON_CATEGORY);
+		int castingMode = client.getVarbitValue(VarbitID.AUTOCAST_DEFMODE);
+		boolean isDefensiveCasting = (castingMode == 1 && comMode == 4);
+		AttackType[] attackTypes = WeaponAttackType.getWeaponAttackType(weaponCategory).getAttackTypes();
 
-    public StyleFactory(Client client)
-    {
-        this.client = client;
-        currentComMode = -1;
-        currentWeaponCategory = -1;
-        currentCastingMode = -1;
-    }
+		if (comMode < attackTypes.length)
+		{
+			return attackTypes[comMode];
+		}
+		else if (comMode == 4 || isDefensiveCasting)
+		{
+			return AttackType.MAGIC;
+		}
 
-    private AttackStyle[] getWeaponTypeStyles(int weaponType)
+		return AttackType.NONE;
+	}
+
+    private static AttackStyle[] getAttackStyles(Client client, int currentWeaponCategory)
     {
         int BLUE_MOON_SPEAR = 22;
         int KERIS_PARTISAN = 30;
-        // from script4525
-        int weaponStyleEnum = client.getEnum(EnumID.WEAPON_STYLES).getIntValue(weaponType);
+        int weaponStyleEnum = client.getEnum(EnumID.WEAPON_STYLES).getIntValue(currentWeaponCategory);
         if (weaponStyleEnum == -1)
         {
             // Blue moon spear
 
-            if (weaponType == BLUE_MOON_SPEAR)
+            if (currentWeaponCategory == BLUE_MOON_SPEAR)
             {
                 return new AttackStyle[]{
                         AttackStyle.ACCURATE,
@@ -49,7 +56,7 @@ public class StyleFactory {
             }
 
             // Partisan
-            if (weaponType == KERIS_PARTISAN)
+            if (currentWeaponCategory == KERIS_PARTISAN)
             {
                 return new AttackStyle[]{
                         AttackStyle.ACCURATE,
@@ -88,37 +95,39 @@ public class StyleFactory {
         return styles;
     }
 
-    public AttackStyle getAttackStyle(Client client)
-    {
-        int styleIndex = currentComMode;
-        AttackStyle[] attackStyles = getWeaponTypeStyles(currentWeaponCategory);
-        AttackStyle attackStyle = null;
-        if (currentComMode < attackStyles.length)
-        {
-            // from script4525
-            // Even though the client has 5 attack styles for Staffs, only attack styles 0-4 are used, with an additional
-            // casting mode set for defensive casting
-            if (currentComMode == 4)
-                styleIndex += currentCastingMode;
+	public static AttackStyle getAttackStyle(Client client)
+	{
+		int comMode = client.getVarpValue(VarPlayerID.COM_MODE);
+		int weaponCategory = client.getVarbitValue(VarbitID.COMBAT_WEAPON_CATEGORY);
+		int castingMode = client.getVarbitValue(VarbitID.AUTOCAST_DEFMODE);
+		AttackStyle[] attackStyles = StyleFactory.getAttackStyles(client, weaponCategory);
+		AttackStyle attackStyle = null;
+		if (comMode < attackStyles.length)
+		{
+			// from script4525
+			// Even though the client has 5 attack styles for Staffs, only attack styles 0-4 are used, with an additional
+			// casting mode set for defensive casting
+			if (comMode == 4)
+				comMode += castingMode;
 
-            attackStyle = attackStyles[styleIndex];
+			attackStyle = attackStyles[comMode];
 
-        }
-        if (attackStyle == null)
-            attackStyle = OTHER;
-        return attackStyle;
-    }
+		}
+		if (attackStyle == null)
+			attackStyle = OTHER;
+		return attackStyle;
+	}
 
-    //Combat type of equipped weapon (Melee, ranged, magic, other)
-    public CombatStyle getCombatType(AttackStyle attackStyle) {
-        if (attackStyle == AttackStyle.ACCURATE ||
-                attackStyle == AttackStyle.AGGRESSIVE ||
-                attackStyle == AttackStyle.CONTROLLED ||
-                attackStyle == AttackStyle.DEFENSIVE)
-            return CombatStyle.MELEE;
-        if (attackStyle.getName().contains("ang")) return CombatStyle.RANGED;
-        if (attackStyle.getName().contains("Casting")) return CombatStyle.MAGE;
-        log.debug("Null combat stlye: {}", attackStyle.getName());
-        return null;
-    }
+	//Combat type of equipped weapon (Melee, ranged, magic, other)
+	public static CombatStyle getCombatType(AttackStyle attackStyle) {
+		if (attackStyle == AttackStyle.ACCURATE ||
+			attackStyle == AttackStyle.AGGRESSIVE ||
+			attackStyle == AttackStyle.CONTROLLED ||
+			attackStyle == AttackStyle.DEFENSIVE)
+			return CombatStyle.MELEE;
+		if (attackStyle.getName().contains("ang")) return CombatStyle.RANGED;
+		if (attackStyle.getName().contains("Casting")) return CombatStyle.MAGE;
+		log.debug("Null combat stlye: {}", attackStyle.getName());
+		return null;
+	}
 }

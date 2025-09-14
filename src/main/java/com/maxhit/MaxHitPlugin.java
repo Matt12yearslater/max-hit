@@ -39,7 +39,7 @@ import com.maxhit.styles.StyleFactory;
 import com.maxhit.styles.CombatStyle;
 
 
-@Slf4j
+
 @PluginDescriptor(
 	name = "Max Hit",
 	description = "Displays current max hit",
@@ -47,7 +47,7 @@ import com.maxhit.styles.CombatStyle;
 	tags = {"max, hit, spec, pvp, magic, spell, combat, gear"}
 )
 
-
+@Slf4j
 public class MaxHitPlugin extends Plugin
 {
 
@@ -75,7 +75,6 @@ public class MaxHitPlugin extends Plugin
 
 	private Instant lastTime;
 	private ItemContainer equippedItems;
-	private StyleFactory styleFactory;
 	private MaxHitCalculatorFactory maxHitCalculatorFactory;
 	@Getter
 	private MaxHitCalculator maxHitCalculator;
@@ -93,7 +92,6 @@ public class MaxHitPlugin extends Plugin
 		overlayManager.add(myOverlay);
 		clientThread.invokeLater(() ->
 		{
-			styleFactory = new StyleFactory(client);
 			maxHitCalculatorFactory = new MaxHitCalculatorFactory(client, itemManager);
 			specialAttackCalculator = new SpecialAttackCalculator(client);
 			if (!client.getGameState().equals(GameState.LOGGED_IN))
@@ -118,7 +116,6 @@ public class MaxHitPlugin extends Plugin
 		overlayManager.remove(myOverlay);
 		lastTime = null;
 		isWieldingSpecialAttackWeapon = false;
-		styleFactory = null;
 		maxHitCalculatorFactory = null;
 		specialAttackCalculator = null;
 		maxHitCalculator = null;
@@ -139,7 +136,7 @@ public class MaxHitPlugin extends Plugin
 		}
 		equippedItems = event.getItemContainer();
 		maxHitCalculator.setEquippedItems(equippedItems);
-		maxHitCalculator.CalculateMaxHit();
+		maxHitCalculator.calculateMaxHit();
 		specialAttackCalculator.setEquippedItems(equippedItems);
 		checkIsWieldingSpecialAttackWeapon();
 	}
@@ -163,7 +160,7 @@ public class MaxHitPlugin extends Plugin
 			{
 				continue;
 			}
-			maxHitCalculator.CalculateMaxHit();
+			maxHitCalculator.calculateMaxHit();
 			return;
 		}
 	}
@@ -183,7 +180,7 @@ public class MaxHitPlugin extends Plugin
 		else if (event.getVarbitId() == VarbitID.AUTOCAST_SPELL ||
 				 event.getVarbitId() == VarbitID.PRAYER_ALLACTIVE)
 		{
-			maxHitCalculator.CalculateMaxHit();
+			maxHitCalculator.calculateMaxHit();
 		}
 	}
 
@@ -197,7 +194,7 @@ public class MaxHitPlugin extends Plugin
 			if (Duration.between(lastTime, Instant.now()).compareTo(WAIT) > 0)
 			{
 				maxHitCalculator.opponent  = null;
-				maxHitCalculator.CalculateMaxHit();
+				maxHitCalculator.calculateMaxHit();
 			}
 		}
 	}
@@ -225,25 +222,21 @@ public class MaxHitPlugin extends Plugin
 		}
 		lastTime = Instant.now();
 		maxHitCalculator.opponent = actor;
-		maxHitCalculator.CalculateMaxHit();
+		maxHitCalculator.calculateMaxHit();
 
 	}
 
 	private void getMaxHit()
 	{
-		styleFactory.setCurrentComMode(client.getVarpValue(VarPlayerID.COM_MODE));
-		styleFactory.setCurrentWeaponCategory(client.getVarbitValue(VarbitID.COMBAT_WEAPON_CATEGORY));
-		styleFactory.setCurrentCastingMode(client.getVarbitValue(VarbitID.AUTOCAST_DEFMODE));
-
-		AttackStyle attackStyle = styleFactory.getAttackStyle(client);
+		AttackStyle attackStyle = StyleFactory.getAttackStyle(client);
 		if (attackStyle == null || attackStyle == AttackStyle.OTHER)
 		{
 			return;
 		}
 
-		CombatStyle combatStyle = styleFactory.getCombatType(attackStyle);
+		CombatStyle combatStyle = StyleFactory.getCombatType(attackStyle);
 		maxHitCalculator = maxHitCalculatorFactory.create(combatStyle, attackStyle);
-		maxHitCalculator.CalculateMaxHit();
+		maxHitCalculator.calculateMaxHit();
 	}
 
 	private void checkIsWieldingSpecialAttackWeapon()
