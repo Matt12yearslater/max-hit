@@ -2,14 +2,16 @@ package com.maxhit.calculators;
 
 import com.google.common.collect.ImmutableSet;
 import com.maxhit.MagicSpell;
-import com.maxhit.PrayerType;
 import com.maxhit.Spellbook;
 import com.maxhit.equipment.EquipmentFunctions;
+import com.maxhit.equipment.GodCape;
+import com.maxhit.equipment.PoweredStaff;
+import com.maxhit.equipment.VirtusPieces;
 import com.maxhit.monsters.MonsterWeaknesses;
+import static com.maxhit.regions.TombsRegions.TOA_ROOM_IDS;
 import com.maxhit.styles.AttackStyle;
-import com.maxhit.styles.CombatStyle;
+import java.util.Arrays;
 import net.runelite.api.Client;
-import net.runelite.api.Item;
 import net.runelite.api.NPC;
 import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.Skill;
@@ -17,52 +19,36 @@ import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.api.gameval.VarbitID;
-import net.runelite.client.game.ItemEquipmentStats;
 import net.runelite.client.game.ItemManager;
-import net.runelite.client.game.ItemStats;
 import lombok.extern.slf4j.Slf4j;
-import java.util.Objects;
 import java.util.Set;
+import net.runelite.client.game.ItemVariationMapping;
 
 @Slf4j
 public class MagicMaxHitCalculator extends MaxHitCalculator
 {
-	private static final Set<Integer> GOD_SPELLS = ImmutableSet.of(19, 20, 52);
-	private static final Set<Integer> BOLT_SPELLS = ImmutableSet.of(6, 7, 8, 9);
-	private static final int TOA_NEXUS_REGION_ID = 14160;
-	private static final int BABA_PUZZLE_ROOM_REGION_ID = 15186;
-	private static final int BABA_ROOM_REGION_ID = 15188;
-	private static final int KEPHRI_PUZZLE_ROOM_REGION_ID = 14162;
-	private static final int KEPHRI_ROOM_REGION_ID = 14164;
-	private static final int AKKHA_PUZZLE_ROOM_REGION_ID = 14674;
-	private static final int AKKHA_ROOM_REGION_ID = 14676;
-	private static final int ZEBAK_PUZZLE_ROOM_REGION_ID = 15698;
-	private static final int ZEBAK_ROOM_REGION_ID = 15700;
-	private static final int WARDENS_OBELISK_ROOM_REGION_ID = 15184;
-	private static final int WARDENS_P3_ROOM_REGION_ID = 15696;
-	private static final int TOA_LOOT_ROOM_REGION_ID = 14672;
-	private static final int TOA_LOBBY_REGION_ID = 13454;
-	private static final Set<Integer> TOA_ROOM_IDS = ImmutableSet.of(
-		TOA_NEXUS_REGION_ID,
-		BABA_PUZZLE_ROOM_REGION_ID,
-		BABA_ROOM_REGION_ID,
-		KEPHRI_PUZZLE_ROOM_REGION_ID,
-		KEPHRI_ROOM_REGION_ID,
-		AKKHA_PUZZLE_ROOM_REGION_ID,
-		AKKHA_ROOM_REGION_ID,
-		ZEBAK_PUZZLE_ROOM_REGION_ID,
-		ZEBAK_ROOM_REGION_ID,
-		WARDENS_OBELISK_ROOM_REGION_ID,
-		WARDENS_P3_ROOM_REGION_ID,
-		TOA_LOOT_ROOM_REGION_ID,
-		TOA_LOBBY_REGION_ID
+	private static final Set<Integer> GOD_SPELLS = ImmutableSet.of(
+		MagicSpell.FLAMES_OF_ZAMORAK.getVarbValue(),
+		MagicSpell.SARADOMIN_STRIKE.getVarbValue(),
+		MagicSpell.CLAWS_OF_GUTHIX.getVarbValue());
+	private static final Set<Integer> BOLT_SPELLS = ImmutableSet.of(
+		MagicSpell.WIND_BOLT.getVarbValue(),
+		MagicSpell.WATER_BOLT.getVarbValue(),
+		MagicSpell.EARTH_BOLT.getVarbValue(),
+		MagicSpell.FIRE_BOLT.getVarbValue());
+	private static final Set<Integer> SMOKE_BATTLESTAVES = new ImmutableSet.Builder<Integer>()
+		.addAll(ItemVariationMapping.getVariations(ItemID.SMOKE_BATTLESTAFF)).build();
+
+	private static final Set<Integer> TUMEKEN_SHADOWS = ImmutableSet.of(
+		ItemID.TUMEKENS_SHADOW,
+		ItemID.TUMEKENS_SHADOW_UNCHARGED
 	);
+
 	MagicSpell activeSpell = null;
 	private double baseSpellDamage;
 	private double baseDamageModifier;
 	private double primaryMagicDamage;
 	private double preHitRoll;
-	private double magicBonus;
 	private double shadowBonus;
 	private double salveBonus;
 	private double avariceBonus;
@@ -81,10 +67,6 @@ public class MagicMaxHitCalculator extends MaxHitCalculator
 	protected MagicMaxHitCalculator(Client client, ItemManager itemManager, AttackStyle attackStyle)
 	{
 		super(client, itemManager, Skill.MAGIC, attackStyle);
-		salveRegularBonus = 0.0;
-		salveEnchantedBonus = 0.0;
-		salveImbuedBonus = 0.15;
-		salveEnchantedImbuedBonus = 0.2;
 		reset();
 	}
 
@@ -94,7 +76,6 @@ public class MagicMaxHitCalculator extends MaxHitCalculator
 		baseSpellDamage = 0.0;
 		baseDamageModifier = 0.0;
 		primaryMagicDamage = 0.0;
-		magicBonus = 0.0;
 		shadowBonus = 1.0;
 		salveBonus = 0.0;
 		avariceBonus = 0.0;
@@ -110,6 +91,16 @@ public class MagicMaxHitCalculator extends MaxHitCalculator
 		ahrimsDamnedBonus = 0.0;
 	}
 
+	@Override
+	protected void getEffectiveStrength()
+	{
+	}
+
+	@Override
+	protected void getStyleBonus()
+	{
+	}
+
 	private boolean chaosGauntletsEquipped()
 	{
 		return EquipmentFunctions.HasEquipped(equippedItems, EquipmentInventorySlot.GLOVES, ItemID.GAUNTLETS_OF_CHAOS);
@@ -117,33 +108,31 @@ public class MagicMaxHitCalculator extends MaxHitCalculator
 
 	private boolean matchingGodCapeEquipped()
 	{
-		int activeSpellVarbit = client.getVarbitValue(VarbitID.AUTOCAST_SPELL);
-		if (activeSpellVarbit == MagicSpell.FLAMES_OF_ZAMORAK.getVarbValue())
+		for (GodCape cape : GodCape.values())
 		{
-
-			return EquipmentFunctions.HasEquipped(equippedItems, EquipmentInventorySlot.CAPE, ItemID.ZAMORAK_CAPE) ||
-				EquipmentFunctions.HasEquipped(equippedItems, EquipmentInventorySlot.CAPE, ItemID.MA2_ZAMORAK_CAPE);
-		}
-		if (activeSpellVarbit == MagicSpell.SARADOMIN_STRIKE.getVarbValue())
-		{
-			return EquipmentFunctions.HasEquipped(equippedItems, EquipmentInventorySlot.CAPE, ItemID.SARADOMIN_CAPE) ||
-				EquipmentFunctions.HasEquipped(equippedItems, EquipmentInventorySlot.CAPE, ItemID.MA2_SARADOMIN_CAPE);
-		}
-		if (activeSpellVarbit == MagicSpell.CLAWS_OF_GUTHIX.getVarbValue())
-		{
-			return EquipmentFunctions.HasEquipped(equippedItems, EquipmentInventorySlot.CAPE, ItemID.GUTHIX_CAPE) ||
-				EquipmentFunctions.HasEquipped(equippedItems, EquipmentInventorySlot.CAPE, ItemID.MA2_GUTHIX_CAPE);
+			if (cape.isEquipped(equippedItems) && activeSpell.getVarbValue() == cape.getSpellId())
+			{
+				return true;
+			}
 		}
 		return false;
 	}
 
 	private void getSpellBaseMaxDamage()
 	{
-		// Tumeken's Shadow
-		if (EquipmentFunctions.HasEquipped(equippedItems, EquipmentInventorySlot.WEAPON, ItemID.TUMEKENS_SHADOW))
+
+		// Powered Staves
+		for (PoweredStaff staff : PoweredStaff.values())
 		{
-			baseSpellDamage = Math.floor((getSkillLevel() / 3.0) + 1.0);
-			return;
+			for (int itemId : staff.getVarients())
+			{
+				if (EquipmentFunctions.HasEquipped(equippedItems, EquipmentInventorySlot.WEAPON, itemId))
+				{
+					baseSpellDamage = staff.getBaseMaxHit(getSkillLevel());
+					return;
+				}
+			}
+
 		}
 
 		int activeSpellVarbit = client.getVarbitValue(VarbitID.AUTOCAST_SPELL);
@@ -175,15 +164,17 @@ public class MagicMaxHitCalculator extends MaxHitCalculator
 			}
 		}
 
-		// Check for Charge with God spells and god cape
+		// Check if a god spell is active
 		if (!GOD_SPELLS.contains(activeSpellVarbit))
 		{
 			return;
 		}
+		// Check if a matching cape is equipped
 		if (!matchingGodCapeEquipped())
 		{
 			return;
 		}
+		// Check if charge is active
 		if (client.getVarbitValue(VarPlayerID.MAGEARENA_CHARGE) == 0)
 		{
 			return;
@@ -191,40 +182,23 @@ public class MagicMaxHitCalculator extends MaxHitCalculator
 		baseDamageModifier += 10;
 	}
 
-	@Override
-	protected void getStrengthBonus()
-	{
-		if (equippedItems == null)
-		{
-			return;
-		}
-		//get str bonus of worn equipment
-		for (EquipmentInventorySlot slot : EquipmentInventorySlot.values())
-		{
-			// Have to convert enum to int i.e. use ordinal
-			Item item = equippedItems.getItem(slot.getSlotIdx());
-			if (item == null)
-			{
-				continue;
-			}
-			int id = item.getId();
-			final ItemStats stats = itemManager.getItemStats(id);
-			if (stats == null)
-			{
-				continue;
-			}
-			final ItemEquipmentStats itemStats = stats.getEquipment();
-			magicBonus += itemStats.getMdmg();
-		}
-	}
-
 	private void getShadowBonus()
 	{
+		boolean shadowEquipped = false;
 		// Check if Shadow equipped
-		if (!EquipmentFunctions.GetEquippedItemString(client, equippedItems, EquipmentInventorySlot.WEAPON).contains("Tumaken"))
+		for (int staffId : TUMEKEN_SHADOWS)
+		{
+			if (EquipmentFunctions.HasEquipped(equippedItems, EquipmentInventorySlot.WEAPON, staffId))
+			{
+				shadowEquipped = true;
+			}
+		}
+
+		if (!shadowEquipped)
 		{
 			return;
 		}
+
 		int region = WorldPoint.fromLocalInstance(client, client.getLocalPlayer().getLocalLocation()).getRegionID();
 		boolean toaInside = TOA_ROOM_IDS.contains(region);
 		if (toaInside)
@@ -234,14 +208,6 @@ public class MagicMaxHitCalculator extends MaxHitCalculator
 		else
 		{
 			shadowBonus = 3.0;
-		}
-	}
-
-	private void getVoidBonus()
-	{
-		if (eliteVoidSetChecker.isWearingEliteVoid(CombatStyle.MAGE))
-		{
-			voidBonus = .05;
 		}
 	}
 
@@ -279,13 +245,14 @@ public class MagicMaxHitCalculator extends MaxHitCalculator
 		{
 			return;
 		}
-		if (EquipmentFunctions.HasEquipped(equippedItems, EquipmentInventorySlot.WEAPON, ItemID.SMOKE_BATTLESTAFF))
+
+		for (int battlestaffId : SMOKE_BATTLESTAVES)
 		{
-			smokeBattlestaffBonus = 0.1;
-		}
-		if (EquipmentFunctions.HasEquipped(equippedItems, EquipmentInventorySlot.WEAPON, ItemID.MYSTIC_SMOKE_BATTLESTAFF))
-		{
-			smokeBattlestaffBonus = 0.1;
+			if (EquipmentFunctions.HasEquipped(equippedItems, EquipmentInventorySlot.WEAPON, battlestaffId))
+			{
+				smokeBattlestaffBonus = 0.1;
+				return;
+			}
 		}
 	}
 
@@ -296,72 +263,26 @@ public class MagicMaxHitCalculator extends MaxHitCalculator
 			virtusBonus = 0.0;
 			return;
 		}
-		if (EquipmentFunctions.GetEquippedItemString(client, equippedItems, EquipmentInventorySlot.HEAD).contains("Virtus"))
-		{
-			virtusBonus += 0.03;
-		}
-		if (EquipmentFunctions.GetEquippedItemString(client, equippedItems, EquipmentInventorySlot.BODY).contains("Virtus"))
-		{
-			virtusBonus += 0.03;
-		}
-		if (EquipmentFunctions.GetEquippedItemString(client, equippedItems, EquipmentInventorySlot.LEGS).contains("Virtus"))
-		{
-			virtusBonus += 0.03;
-		}
-	}
-
-	@Override
-	protected void getPrayerBonus()
-	{
-		if (PrayerType.MYSTIC_LORE.isActive(client))
-		{
-			prayerBonus = 0.01;
-		}
-		if (PrayerType.MYSTIC_MIGHT.isActive(client))
-		{
-			prayerBonus = 0.02;
-		}
-		if (PrayerType.MYSTIC_VIGOUR.isActive(client))
-		{
-			prayerBonus = 0.03;
-		}
-		if (PrayerType.AUGURY.isActive(client))
-		{
-			prayerBonus = 0.04;
-		}
+		// Count how many pieces are equipped and multiply by the bonus per piece.
+		long piecesEquipped = Arrays.stream(VirtusPieces.values())
+			.filter(piece -> piece.isEquipped(equippedItems))
+			.count();
+		virtusBonus = piecesEquipped * 0.02;
 	}
 
 	private void getElementalWeakness()
 	{
-		if (opponent == null)
+		for (MonsterWeaknesses monster : MonsterWeaknesses.values())
 		{
-			return;
-		}
-		NPC npc = (NPC) opponent;
-		String npcName = npc.getName();
-		if (npcName == null)
-		{
-			return;
-		}
-		for (MonsterWeaknesses weakness : MonsterWeaknesses.values())
-		{
-			if (weakness.getId() != npc.getId())
+			if (monster.hasWeakness(opponent, activeSpell))
 			{
-				continue;
-			}
-			if (!Objects.equals(activeSpell.getElement(), weakness.getElement()))
-			{
+				elementalWeakness += monster.getSeverity();
 				return;
 			}
-			elementalWeakness += weakness.getSeverity();
-			return;
+
 		}
 	}
 
-	@Override
-	protected void getEffectiveStrength()
-	{
-	}
 
 	private void getPrimaryMagicDamage()
 	{
@@ -374,7 +295,8 @@ public class MagicMaxHitCalculator extends MaxHitCalculator
 		getVirtusBonus();
 		getPrayerBonus();
 		getElementalWeakness();
-		double tempBonuses = (magicBonus - voidBonus) * shadowBonus;
+		double tempBonuses = (strengthBonus - voidBonus) * shadowBonus;
+		tempBonuses = Math.min(1.0, tempBonuses);
 		double totalBonus = voidBonus + salveBonus + avariceBonus + smokeBattlestaffBonus + virtusBonus + prayerBonus;
 		double elementalWeaknessAddition = Math.floor(baseDamageModifier * elementalWeakness);
 		primaryMagicDamage = Math.floor(baseDamageModifier * (1 + tempBonuses + totalBonus) + elementalWeaknessAddition);
@@ -396,7 +318,7 @@ public class MagicMaxHitCalculator extends MaxHitCalculator
 	}
 
 	@Override
-	public void CalculateMaxHit()
+	public void calculateMaxHit()
 	{
 		reset();
 		// Base Damage Modifier
@@ -405,7 +327,6 @@ public class MagicMaxHitCalculator extends MaxHitCalculator
 		getPrimaryMagicDamage();
 		// Pre Hit Roll == Hit Roll
 		// Don't need to use the hit roll step on the wiki since we're just calculating max hit
-
 		getPreHitRoll();
 		double firstFloorCalculation = Math.floor(preHitRoll * (1 + markOfDarknessBonus));
 		// Skip castle wars bonus
@@ -413,8 +334,9 @@ public class MagicMaxHitCalculator extends MaxHitCalculator
 		maxHit = Math.floor(firstFloorCalculation * (1 + ahrimsDamnedBonus));
 	}
 
-    @Override
-    public void calculateNextMaxHitReqs() {
+	@Override
+	public void calculateNextMaxHitRequirements()
+	{
 		//TODO: Implement
-    }
+	}
 }
