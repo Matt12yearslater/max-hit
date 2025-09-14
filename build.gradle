@@ -1,5 +1,13 @@
 plugins {
 	id 'java'
+    id 'idea'
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
 }
 
 repositories {
@@ -11,6 +19,7 @@ repositories {
 }
 
 def runeLiteVersion = 'latest.release'
+def junitVersion = "5.5.2" // max version before junit-bom was added to pom files, due to runelite restrictions
 
 dependencies {
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
@@ -18,15 +27,31 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok:1.18.20'
 	annotationProcessor 'org.projectlombok:lombok:1.18.20'
 
-	testImplementation 'junit:junit:4.12'
+    testCompileOnly 'org.projectlombok:lombok:1.18.20'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+
 	testImplementation group: 'net.runelite', name:'client', version: runeLiteVersion
 	testImplementation group: 'net.runelite', name:'jshell', version: runeLiteVersion
+
+    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-api", version: junitVersion
+    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-params", version: junitVersion
+    testImplementation group: "org.junit.jupiter", name: "junit-jupiter-engine", version: junitVersion
+
+    testImplementation "org.mockito:mockito-core:5.17.0"
+    testImplementation(group: 'com.google.inject.extensions', name:'guice-testlib', version: "4.1.0") {
+        exclude group: 'com.google.inject', module: 'guice' // already provided by runelite
+    }
 }
 
-group = 'com.example'
-version = '1.0-SNAPSHOT'
-sourceCompatibility = '1.8'
+group = 'com.maxhit'
+version = '4.0'
+sourceCompatibility = JavaVersion.VERSION_11
 
-tasks.withType(JavaCompile) {
-	options.encoding = 'UTF-8'
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }
+
+tasks.test {
+    useJUnitPlatform()
+}
+targetCompatibility = JavaVersion.VERSION_11

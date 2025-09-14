@@ -1,4 +1,4 @@
-package com.maxhit;
+  package com.maxhit;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,16 +12,16 @@ import net.runelite.api.gameval.VarbitID;
 public enum PrayerType
 {
     // Melee
-    BURST_OF_STRENGTH("Burst of Strength", Prayer.BURST_OF_STRENGTH),
-    SUPERHUMAN_STRENGTH("Superhuman Strength", Prayer.SUPERHUMAN_STRENGTH),
-    ULTIMATE_STRENGTH("Ultimate Strength", Prayer.ULTIMATE_STRENGTH),
-    CHIVALRY("Chivalry", Prayer.CHIVALRY),
-    PIETY("Piety", Prayer.PIETY),
+    BURST_OF_STRENGTH(Prayer.BURST_OF_STRENGTH),
+    SUPERHUMAN_STRENGTH(Prayer.SUPERHUMAN_STRENGTH),
+    ULTIMATE_STRENGTH(Prayer.ULTIMATE_STRENGTH),
+    CHIVALRY(Prayer.CHIVALRY),
+    PIETY(Prayer.PIETY),
 
     //Ranged
-    SHARP_EYE("Sharp Eye", Prayer.SHARP_EYE),
-    HAWK_EYE("Hawk Eye", Prayer.HAWK_EYE),
-    EAGLE_EYE("Eagle Eye", Prayer.EAGLE_EYE)
+    SHARP_EYE(Prayer.SHARP_EYE),
+    HAWK_EYE(Prayer.HAWK_EYE),
+    EAGLE_EYE(Prayer.EAGLE_EYE)
             {
                 @Override
                 public boolean isEnabled(Client client)
@@ -29,7 +29,7 @@ public enum PrayerType
                     return !DEADEYE.isEnabled(client);
                 }
             },
-    DEADEYE("Deadeye", Prayer.DEADEYE)
+    DEADEYE(Prayer.DEADEYE)
             {
                 @Override
                 public boolean isEnabled(Client client)
@@ -39,12 +39,12 @@ public enum PrayerType
                     return deadeye && !inLms;
                 }
             },
-    RIGOUR("Rigour", Prayer.RIGOUR),
+    RIGOUR(Prayer.RIGOUR),
 
     //Magic
-    MYSTIC_WILL("Mystic Will", Prayer.MYSTIC_WILL),
-    MYSTIC_LORE("Mystic Lore", Prayer.MYSTIC_LORE),
-    MYSTIC_MIGHT("Mystic Might", Prayer.MYSTIC_MIGHT)
+    MYSTIC_WILL(Prayer.MYSTIC_WILL),
+    MYSTIC_LORE(Prayer.MYSTIC_LORE),
+    MYSTIC_MIGHT(Prayer.MYSTIC_MIGHT)
             {
                 @Override
                 public boolean isEnabled(Client client)
@@ -52,7 +52,7 @@ public enum PrayerType
                     return !MYSTIC_VIGOUR.isEnabled(client);
                 }
             },
-    MYSTIC_VIGOUR("Mystic Vigour", Prayer.MYSTIC_VIGOUR)
+    MYSTIC_VIGOUR(Prayer.MYSTIC_VIGOUR)
             {
                 @Override
                 public boolean isEnabled(Client client)
@@ -62,18 +62,17 @@ public enum PrayerType
                     return vigour && !inLms;
                 }
             },
-    AUGURY("Augury", Prayer.AUGURY),
+    AUGURY(Prayer.AUGURY),
 
     // Leagues
-    RP_ANCIENT_STRENGTH("Ancient Strength", Prayer.RP_ANCIENT_STRENGTH),
-    RP_ANCIENT_SIGHT("Ancient Sight", Prayer.RP_ANCIENT_SIGHT),
-    RP_TRINITAS("Trinitas", Prayer.RP_TRINITAS),
-    RP_DECIMATE("Decimate", Prayer.RP_DECIMATE),
-    RP_ANNIHILATE("Annihilate", Prayer.RP_ANNIHILATE),
-    RP_VAPORISE("Vaporise", Prayer.RP_VAPORISE),
+    RP_ANCIENT_STRENGTH(Prayer.RP_ANCIENT_STRENGTH),
+    RP_ANCIENT_SIGHT(Prayer.RP_ANCIENT_SIGHT),
+    RP_TRINITAS(Prayer.RP_TRINITAS),
+    RP_DECIMATE(Prayer.RP_DECIMATE),
+    RP_ANNIHILATE(Prayer.RP_ANNIHILATE),
+    RP_VAPORISE(Prayer.RP_VAPORISE),
     ;
 
-    private final String name;
     private final Prayer prayer;
 
     public boolean isEnabled(Client client)
