@@ -1,38 +1,39 @@
 package com.maxhit.sets;
 
+import com.google.common.collect.ImmutableSet;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import net.runelite.api.Client;
+import net.runelite.api.EquipmentInventorySlot;
+import net.runelite.api.Skill;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.client.game.ItemVariationMapping;
 
-public class DharokSet extends EquipmentSet {
-    public DharokSet(Client client) {
-        this.client = client;
-        this.heads = new int[] {
-                ItemID.BARROWS_DHAROK_HEAD,
-                ItemID.BARROWS_DHAROK_HEAD_100,
-                ItemID.BARROWS_DHAROK_HEAD_75,
-                ItemID.BARROWS_DHAROK_HEAD_50,
-                ItemID.BARROWS_DHAROK_HEAD_25,
-        };
-        this.bodies = new int[] {
-                ItemID.BARROWS_DHAROK_BODY,
-                ItemID.BARROWS_DHAROK_BODY_100,
-                ItemID.BARROWS_DHAROK_BODY_75,
-                ItemID.BARROWS_DHAROK_BODY_50,
-                ItemID.BARROWS_DHAROK_BODY_25,
-        };
-        this.legs = new int[] {
-                ItemID.BARROWS_DHAROK_LEGS,
-                ItemID.BARROWS_DHAROK_LEGS_100,
-                ItemID.BARROWS_DHAROK_LEGS_75,
-                ItemID.BARROWS_DHAROK_LEGS_50,
-                ItemID.BARROWS_DHAROK_LEGS_25,
-        };
-        this.weapons = new int[] {
-                 ItemID.BARROWS_DHAROK_WEAPON,
-                 ItemID.BARROWS_DHAROK_WEAPON_100,
-                 ItemID.BARROWS_DHAROK_WEAPON_75,
-                 ItemID.BARROWS_DHAROK_WEAPON_50,
-                 ItemID.BARROWS_DHAROK_WEAPON_25,
-        };
-    }
+public class DharokSet extends EquipmentSet
+{
+	public DharokSet(Client client)
+	{
+		this.client = client;
+	}
+
+	@Override
+	public Map<EquipmentInventorySlot, Collection<Integer>> getEquipment()
+	{
+		return Map.of(
+			EquipmentInventorySlot.HEAD, ItemVariationMapping.getVariations(ItemID.BARROWS_DHAROK_HEAD),
+			EquipmentInventorySlot.BODY, ItemVariationMapping.getVariations(ItemID.BARROWS_DHAROK_BODY),
+			EquipmentInventorySlot.LEGS, ItemVariationMapping.getVariations(ItemID.BARROWS_DHAROK_LEGS),
+			EquipmentInventorySlot.WEAPON, ItemVariationMapping.getVariations(ItemID.BARROWS_DHAROK_WEAPON)
+		);
+	}
+
+	@Override
+	public double getMultiplier()
+	{
+		double baseHitpoints = client.getRealSkillLevel(Skill.HITPOINTS);
+		double currentHitpoints = client.getBoostedSkillLevel(Skill.HITPOINTS);
+		return (1.0 + (((baseHitpoints - currentHitpoints) / 100.0) * baseHitpoints / 100.0));
+	}
 }

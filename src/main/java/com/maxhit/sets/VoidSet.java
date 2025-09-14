@@ -1,41 +1,59 @@
 package com.maxhit.sets;
 
-import com.maxhit.styles.CombatStyle;
+import com.google.common.collect.ImmutableSet;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 import net.runelite.api.Client;
+import net.runelite.api.EquipmentInventorySlot;
+import net.runelite.api.Skill;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.client.game.ItemVariationMapping;
 
-public class VoidSet extends EquipmentSet {
+public class VoidSet extends EquipmentSet
+{
+	protected final Skill skill;
 
-    public VoidSet(Client client) {
-        this.client = client;
-        this.bodies = new int[]{
-                ItemID.PEST_VOID_KNIGHT_TOP,
-        };
-        this.legs = new int[]{
-                ItemID.PEST_VOID_KNIGHT_ROBES,
-        };
-        this.gloves = new int[]{
-                ItemID.PEST_VOID_KNIGHT_GLOVES,
-        };
-    }
+	public VoidSet(Client client, Skill skill)
+	{
+		this.client = client;
+		this.skill = skill;
+	}
 
-    public boolean isWearingVoid(CombatStyle combatStyle) {
-        final int[] meleeHeads = {
-                ItemID.GAME_PEST_MELEE_HELM,
-        };
-        final int[] rangedHeads = {
-                ItemID.GAME_PEST_ARCHER_HELM,
-        };
-        final int[] mageHeads = {
-                ItemID.GAME_PEST_MAGE_HELM,
-        };
-        if (combatStyle == CombatStyle.MELEE) {
-            this.heads = meleeHeads;
-        } else if (combatStyle == CombatStyle.RANGED) {
-            this.heads = rangedHeads;
-        } else {
-            this.heads = mageHeads;
-        }
-        return isWearingSet();
-    }
+	protected Collection<Integer> getHelmIds()
+	{
+		switch (skill)
+		{
+			case STRENGTH:
+				return ItemVariationMapping.getVariations(ItemID.GAME_PEST_MELEE_HELM);
+			case RANGED:
+				return ItemVariationMapping.getVariations(ItemID.GAME_PEST_ARCHER_HELM);
+			case MAGIC:
+				return ItemVariationMapping.getVariations(ItemID.GAME_PEST_MAGE_HELM);
+		}
+		return null;
+	}
+
+	@Override
+	public Map<EquipmentInventorySlot, Collection<Integer>> getEquipment()
+	{
+		return Map.of(
+			EquipmentInventorySlot.HEAD, getHelmIds(),
+			EquipmentInventorySlot.BODY, ItemVariationMapping.getVariations(ItemID.PEST_VOID_KNIGHT_TOP),
+			EquipmentInventorySlot.LEGS, ItemVariationMapping.getVariations(ItemID.PEST_VOID_KNIGHT_ROBES),
+			EquipmentInventorySlot.GLOVES, ItemVariationMapping.getVariations(ItemID.PEST_VOID_KNIGHT_GLOVES)
+		);
+	}
+
+	@Override
+	public double getMultiplier()
+	{
+		switch(skill)
+		{
+			case STRENGTH:
+			case RANGED:
+				return 1.1;
+		}
+		return 1.0;
+	}
 }
