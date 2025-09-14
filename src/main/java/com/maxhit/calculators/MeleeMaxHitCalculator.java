@@ -1,26 +1,28 @@
 package com.maxhit.calculators;
 
 import com.maxhit.NextMaxHitReqs;
-import com.maxhit.PrayerType;
+import com.maxhit.equipment.EquipmentFunctions;
+import com.maxhit.sets.FullObsidianSet;
+import com.maxhit.sets.InquisitorSet;
 import com.maxhit.styles.AttackStyle;
+import java.util.Collection;
 import lombok.extern.slf4j.Slf4j;
 import com.maxhit.sets.DharokSet;
 import com.maxhit.sets.ObsidianSet;
-import com.maxhit.styles.CombatStyle;
 import net.runelite.api.Client;
-import net.runelite.api.Item;
 import net.runelite.api.EquipmentInventorySlot;
 import net.runelite.api.Skill;
-import net.runelite.client.game.ItemEquipmentStats;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.client.game.ItemManager;
-import net.runelite.client.game.ItemStats;
+import net.runelite.client.game.ItemVariationMapping;
 
 @Slf4j
 public class MeleeMaxHitCalculator extends MaxHitCalculator
 {
-
+	private final Collection<Integer> FANGS = ItemVariationMapping.getVariations(ItemID.OSMUMTENS_FANG);
 	private final DharokSet dharokSetChecker;
 	private final ObsidianSet obsidianSetChecker;
+	private final FullObsidianSet fullObsidianSetChecker;
 	private double baseDamage;
 	private double specialBonus;
 
@@ -29,6 +31,7 @@ public class MeleeMaxHitCalculator extends MaxHitCalculator
 		super(client, itemManager, Skill.STRENGTH, attackStyle);
 		dharokSetChecker = new DharokSet(client);
 		obsidianSetChecker = new ObsidianSet(client);
+		fullObsidianSetChecker = new FullObsidianSet(client);
 		reset();
 	}
 
@@ -40,86 +43,11 @@ public class MeleeMaxHitCalculator extends MaxHitCalculator
 		specialBonus = 1.0;
 	}
 
-	private void getStyleBonus()
+	@Override
+	protected void getStyleBonus()
 	{
 		if (attackStyle == AttackStyle.AGGRESSIVE) {styleBonus = 3.0;}
 		if (attackStyle == AttackStyle.CONTROLLED) {styleBonus = 1.0;}
-	}
-
-
-	private void getVoidModifier()
-	{
-		if (voidSetChecker.isWearingVoid(CombatStyle.MELEE))
-		{
-			voidBonus = 1.1;
-		}
-		if (eliteVoidSetChecker.isWearingEliteVoid(CombatStyle.MELEE))
-		{
-			voidBonus = 1.1;
-		}
-	}
-
-	@Override
-	protected void getPrayerBonus()
-	{
-		if (PrayerType.BURST_OF_STRENGTH.isActive(client))
-		{
-			prayerBonus = 1.05;
-		}
-		if (PrayerType.SUPERHUMAN_STRENGTH.isActive(client))
-		{
-			prayerBonus = 1.1;
-		}
-		if (PrayerType.ULTIMATE_STRENGTH.isActive(client))
-		{
-			prayerBonus = 1.15;
-		}
-		if (PrayerType.CHIVALRY.isActive(client))
-		{
-			prayerBonus = 1.18;
-		}
-		if (PrayerType.PIETY.isActive(client))
-		{
-			prayerBonus = 1.23;
-		}
-	}
-
-	@Override
-	protected void getEffectiveStrength()
-	{
-		getStyleBonus();
-		getPrayerBonus();
-		getVoidModifier();
-		effectiveStrength = Math.floor((Math.floor(getSkillLevel() * prayerBonus) + styleBonus + 8.0) * voidBonus);
-	}
-
-	@Override
-	protected void getStrengthBonus()
-	{
-		if (equippedItems == null)
-		{
-			return;
-		}
-		int bonus = 0;
-		//get str bonus of worn equipment
-		for (EquipmentInventorySlot slot : EquipmentInventorySlot.values())
-		{
-			// Have to convert enum to int i.e. use ordinal
-			Item item = equippedItems.getItem(slot.getSlotIdx());
-			if (item == null)
-			{
-				continue;
-			}
-			int id = item.getId();
-			final ItemStats stats = itemManager.getItemStats(id);
-			if (stats == null)
-			{
-				continue;
-			}
-			final ItemEquipmentStats itemStats = stats.getEquipment();
-			bonus += itemStats.getStr();
-		}
-		strengthBonus = bonus;
 	}
 
 	private void getBaseDamage()
@@ -136,41 +64,54 @@ public class MeleeMaxHitCalculator extends MaxHitCalculator
 		// Excludes special attacks
 		if (dharokSetChecker.isWearingSet())
 		{
-			double baseHitpoints = client.getRealSkillLevel(Skill.HITPOINTS);
-			double currentHitpoints = client.getBoostedSkillLevel(Skill.HITPOINTS);
-			specialBonus += (1 + (((baseHitpoints - currentHitpoints) / 100) * baseHitpoints / 100));
+			specialBonus = dharokSetChecker.getMultiplier();
 		}
 
-		if (obsidianSetChecker.isWearingMaxSet())
+		if (obsidianSetChecker.isWearingSet())
 		{
-			specialBonus += 0.32;
+			specialBonus += obsidianSetChecker.getMultiplier();
 		}
-		if (obsidianSetChecker.isWearingWeaponAndNecklace())
+		if (fullObsidianSetChecker.isWearingSet())
 		{
-			specialBonus += 0.2;
+			specialBonus += fullObsidianSetChecker.getMultiplier();
 		}
+		//TODO update logic to detect just amulet
 		if (obsidianSetChecker.isWearingSet())
 		{
 			specialBonus += 0.1;
 		}
 		getSalveBonus();
+
+		specialBonus += InquisitorSet.getMultiplier(client, equippedItems);
+
 		specialBonus += salveBonus;
 	}
 
 	//TODO add support for Keris/Keris Partisan vs Kalphites
 
 	@Override
-	public void CalculateMaxHit()
+	public void calculateMaxHit()
 	{
 		reset();
 		getSpecialBonus();
 		getBaseDamage();
 		maxHit = Math.floor(baseDamage * specialBonus);
-		calculateNextMaxHitReqs();
+
+		// The Fang calculation is a bit different. Confirmed in-game
+		for(int itemId : FANGS)
+		{
+			if (EquipmentFunctions.HasEquipped(equippedItems, EquipmentInventorySlot.WEAPON, itemId))
+			{
+				double fangShrink = Math.floor(maxHit * 3.0 / 20.0);
+				maxHit -= fangShrink;
+				break;
+			}
+		}
+		calculateNextMaxHitRequirements();
 	}
 
 	@Override
-	protected void calculateNextMaxHitReqs()
+	protected void calculateNextMaxHitRequirements()
 	{
 		final double nextMaxHit = maxHit + 1.0;
 		double nextBaseDamage = nextMaxHit / specialBonus;
