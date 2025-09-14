@@ -20,11 +20,10 @@ Currently, this plugin does not work for the following weapons/bonuses:
 
 Toxic Blowpipe<br>
 Dinh's Bulwark<br>
-[Powered Staves](https://oldschool.runescape.wiki/w/Powered_staff)<br>
 Slayer Helm/Black Mask<br>
-Inquisitor's Set<br>
-Crystal Set
-
+Golembane Effect<br>
+Soul Reaper Axe<br>
+Flat Armor effect<br>
 
 ## Help and discussion
 
