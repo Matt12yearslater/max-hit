@@ -67,7 +67,6 @@ public enum SpecialAttackWeapon
 
 	@Getter
 	private final int itemId;
-
 	@Getter
 	private final double damageMultiplier;
 

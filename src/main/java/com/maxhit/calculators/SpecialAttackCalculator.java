@@ -1,5 +1,6 @@
 package com.maxhit.calculators;
 
+import com.maxhit.equipment.EnchantedBolt;
 import com.maxhit.equipment.EquipmentFunctions;
 import com.maxhit.equipment.SpecialAttackWeapon;
 import lombok.Setter;
@@ -11,7 +12,7 @@ import net.runelite.api.Skill;
 
 public class SpecialAttackCalculator
 {
-	private Client client;
+	private final Client client;
 	@Setter
 	private ItemContainer equippedItems;
 
@@ -36,29 +37,15 @@ public class SpecialAttackCalculator
 			}
 		}
 
-		String ammoName = EquipmentFunctions.GetEquippedItemString(client, equippedItems, EquipmentInventorySlot.AMMO);
-		if (weaponName.contains("rossbo") && ammoName.contains("(e)"))
+		if (weaponName.contains("rossbo"))
 		{
-			int playerRangedLevel = client.getBoostedSkillLevel(Skill.RANGED);
-			if (ammoName.contains("Diamond"))
+			int rangedLevel = client.getBoostedSkillLevel(Skill.RANGED);
+			for (EnchantedBolt bolt : EnchantedBolt.values())
 			{
-				return Math.floor(maxHitBase) * 1.15;
-			}
-			if (ammoName.contains("Onyx"))
-			{
-				return Math.floor(maxHitBase) * 1.2;
-			}
-			if (ammoName.contains("Dragonstone"))
-			{
-				return Math.floor(maxHitBase) + Math.floor(playerRangedLevel * 0.2);
-			}
-			if (ammoName.contains("Opal"))
-			{
-				return Math.floor(maxHitBase) + Math.floor(playerRangedLevel * 0.1);
-			}
-			if (ammoName.contains("Pearl"))
-			{
-				return Math.floor(maxHitBase) + Math.floor(playerRangedLevel * .05);
+				if (bolt.isEquipped(client, equippedItems))
+				{
+					return bolt.getDamageMultiplier(maxHitBase, rangedLevel);
+				}
 			}
 		}
 		return maxHitBase;
