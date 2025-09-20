@@ -47,6 +47,7 @@ public class PlayerSetupsTest extends MockedTest
 			try(MockedStatic<StrengthBonusCalculator> strengthBonusCalculatorMockedStatic = mockStatic(StrengthBonusCalculator.class))
 			{
 				final Skill skill = maxHitCalculator.getSkill();
+				strengthBonusCalculatorMockedStatic.when(() -> StrengthBonusCalculator.getDinhsBonus(setup.getAttackStyle(), mockedItemContainer, itemManager)).thenCallRealMethod();
 				strengthBonusCalculatorMockedStatic.when(() ->StrengthBonusCalculator.getStrengthBonus(mockedItemContainer, itemManager, skill)).thenReturn(setup.getStrengthBonus());
 				assertEquals(setup.getMaxHitCalculatorClass(), maxHitCalculator.getClass());
 				maxHitCalculator.calculateMaxHit();

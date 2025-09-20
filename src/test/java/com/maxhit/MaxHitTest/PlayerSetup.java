@@ -44,6 +44,12 @@ public enum PlayerSetup
 		)),
 		CombatStyle.MELEE, AttackStyle.ACCURATE, MeleeMaxHitCalculator.class,
 		181.0f, 3.0, 35.0),
+	DINHS(
+		createEquipment(Map.of(
+			EquipmentInventorySlot.WEAPON.getSlotIdx(), new Item(ItemID.DINHS_BULWARK_ORNAMENT, 1)
+		)),
+		CombatStyle.MELEE, AttackStyle.ACCURATE, MeleeMaxHitCalculator.class,
+		129.0f, 3.0, 32.0),
 	MAX_DHAROK(
 		createEquipment(Map.of(
 			EquipmentInventorySlot.HEAD.getSlotIdx(), new Item(ItemID.BARROWS_DHAROK_HEAD, 1),
