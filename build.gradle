@@ -44,7 +44,7 @@ dependencies {
 }
 
 group = 'com.maxhit'
-version = '4.0'
+version = '4.0.1'
 sourceCompatibility = JavaVersion.VERSION_11
 
 tasks.withType(JavaCompile).configureEach {

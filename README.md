@@ -19,7 +19,6 @@ link below if they don't match
 Currently, this plugin does not work for the following weapons/bonuses:
 
 Toxic Blowpipe<br>
-Dinh's Bulwark<br>
 Slayer Helm/Black Mask<br>
 Golembane Effect<br>
 Soul Reaper Axe<br>
