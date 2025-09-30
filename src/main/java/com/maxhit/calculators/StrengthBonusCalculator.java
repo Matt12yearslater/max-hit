@@ -92,6 +92,6 @@ public class StrengthBonusCalculator
 			return (float) itemEquipmentStats.getStr();
 		if (skill == Skill.RANGED)
 			return (float) itemEquipmentStats.getRstr();
-		return itemEquipmentStats.getMdmg();
+		return itemEquipmentStats.getMdmg() / 100.0f;
 	}
 }
