@@ -1,11 +1,13 @@
 package com.maxhit.calculators;
 
+import com.google.common.collect.ImmutableSet;
 import com.maxhit.NextMaxHitReqs;
 import com.maxhit.equipment.EquipmentFunctions;
 import com.maxhit.sets.FullObsidianSet;
 import com.maxhit.sets.InquisitorSet;
 import com.maxhit.styles.AttackStyle;
 import java.util.Collection;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import com.maxhit.sets.DharokSet;
 import com.maxhit.sets.ObsidianSet;
@@ -20,6 +22,7 @@ import net.runelite.client.game.ItemVariationMapping;
 public class MeleeMaxHitCalculator extends MaxHitCalculator
 {
 	private final Collection<Integer> FANGS = ItemVariationMapping.getVariations(ItemID.OSMUMTENS_FANG);
+	private final Set<Integer> DINHS = ImmutableSet.of(ItemID.DINHS_BULWARK_ORNAMENT, ItemID.DINHS_BULWARK);
 	private final DharokSet dharokSetChecker;
 	private final ObsidianSet obsidianSetChecker;
 	private final FullObsidianSet fullObsidianSetChecker;
@@ -54,6 +57,14 @@ public class MeleeMaxHitCalculator extends MaxHitCalculator
 	{
 		getEffectiveStrength();
 		getStrengthBonus();
+		for (int itemId : DINHS)
+		{
+			if (EquipmentFunctions.HasEquipped(equippedItems, EquipmentInventorySlot.WEAPON, itemId))
+			{
+				strengthBonus += StrengthBonusCalculator.getDinhsBonus(attackStyle, equippedItems, itemManager);
+				break;
+			}
+		}
 		double bonusMultiplier = (strengthBonus + 64.0) / 640.0;
 		baseDamage = Math.floor(0.5 + (effectiveStrength * bonusMultiplier));
 	}
@@ -95,7 +106,7 @@ public class MeleeMaxHitCalculator extends MaxHitCalculator
 		reset();
 		getSpecialBonus();
 		getBaseDamage();
-		maxHit = Math.floor(baseDamage * specialBonus);
+		maxHit = Math.max(0.0, Math.floor(baseDamage * specialBonus));
 
 		// The Fang calculation is a bit different. Confirmed in-game
 		for(int itemId : FANGS)

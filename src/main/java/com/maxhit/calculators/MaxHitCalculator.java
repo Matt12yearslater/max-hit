@@ -23,10 +23,9 @@ public abstract class MaxHitCalculator
     protected final Skill skill;
 	@Setter
 	protected AttackStyle attackStyle;
-    protected double effectiveStrength;
-	// Making this a float to account for magic damage being a percent
 	protected BonusCalculator bonusCalculator;
-    protected float strengthBonus;
+    protected double effectiveStrength;
+    protected double strengthBonus;
     protected double prayerBonus;
     protected double styleBonus;
 	protected double salveBonus;

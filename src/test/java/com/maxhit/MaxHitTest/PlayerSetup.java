@@ -44,6 +44,12 @@ public enum PlayerSetup
 		)),
 		CombatStyle.MELEE, AttackStyle.ACCURATE, MeleeMaxHitCalculator.class,
 		181.0f, 3.0, 35.0),
+	DINHS(
+		createEquipment(Map.of(
+			EquipmentInventorySlot.WEAPON.getSlotIdx(), new Item(ItemID.DINHS_BULWARK_ORNAMENT, 1)
+		)),
+		CombatStyle.MELEE, AttackStyle.ACCURATE, MeleeMaxHitCalculator.class,
+		129.0f, 3.0, 32.0),
 	MAX_DHAROK(
 		createEquipment(Map.of(
 			EquipmentInventorySlot.HEAD.getSlotIdx(), new Item(ItemID.BARROWS_DHAROK_HEAD, 1),
@@ -62,6 +68,12 @@ public enum PlayerSetup
 		)),
 		CombatStyle.RANGED, AttackStyle.ACCURATE, RangedMaxHitCalculator.class,
 		121.0f, 3.0, 36.0),
+	MAX_RANGE_BALLISTA(
+		createEquipment(Map.of(
+			EquipmentInventorySlot.WEAPON.getSlotIdx(), new Item(ItemID.HEAVY_BALLISTA, 1)
+		)),
+		CombatStyle.RANGED, AttackStyle.ACCURATE, RangedMaxHitCalculator.class,
+		189.0f, 5.0, 43.0),
 	VIRTUS_MAGE(
 	createEquipment(Map.of(
 		EquipmentInventorySlot.HEAD.getSlotIdx(), new Item(ItemID.VIRTUS_MASK, 1),

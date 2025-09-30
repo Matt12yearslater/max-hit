@@ -13,12 +13,13 @@ public enum SpecialAttackWeapon
 	ABYSSAL_BLUDGEON(ItemID.ABYSSAL_BLUDGEON, -1.0)
 		{
 			@Override
-			public double getSpecialAttackDamage(Client client, double maxBase)
+			public double getSpecialAttackDamage(Client client, double maxHitBase)
 			{
 				int maxPrayerPoints = client.getRealSkillLevel(Skill.PRAYER);
 				int actualPrayerPoints = client.getBoostedSkillLevel(Skill.PRAYER);
 				int prayerPointsMissing = maxPrayerPoints - actualPrayerPoints;
-				return (1.0 + (0.005 * prayerPointsMissing));
+				double damageMultiplier = (1.0 + (0.005 * prayerPointsMissing));
+				return Math.floor(maxHitBase * damageMultiplier);
 			}
 		},
 	ABYSSAL_DAGGER(ItemID.ABYSSAL_DAGGER, 0.85),
