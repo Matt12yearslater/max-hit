@@ -1,7 +1,11 @@
 package com.maxhit.monsters;
 
+import com.maxhit.MagicSpell;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.runelite.api.Actor;
+import net.runelite.api.NPC;
 
 @AllArgsConstructor
 @Getter
@@ -1436,4 +1440,24 @@ public enum MonsterWeaknesses {
 	private final int id;
 	private final String element;
 	private final double severity;
+
+
+	public boolean hasWeakness(Actor opponent, MagicSpell activeSpell)
+	{
+		if (opponent == null)
+		{
+			return false;
+		}
+		NPC npc = (NPC) opponent;
+		String npcName = npc.getName();
+		if (npcName == null)
+		{
+			return false;
+		}
+		if (id != npc.getId())
+		{
+			return false;
+		}
+		return Objects.equals(activeSpell.getElement(), element);
+	}
 }
