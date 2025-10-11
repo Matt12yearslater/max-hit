@@ -7,18 +7,47 @@ import java.util.Set;
 public class UndeadMonsters {
 	public static final Set<Integer> ID_LIST = ImmutableSet.of(
 		2, //Aberrant spectre
+		3, //Aberrant spectre
+		4, //Aberrant spectre
+		5, //Aberrant spectre
+		6, //Aberrant spectre
+		7, //Aberrant spectre
 		7402, //Abhorrent spectre
 		2514, //Ankou
+		2517, //Ankou
 		2515, //Ankou
+		2518, //Ankou
 		2516, //Ankou
+		2519, //Ankou
+		6608, //Ankou
 		7257, //Ankou
 		7864, //Ankou
 		12730, //Armoured zombie (Defender of Varrock)
+		12731, //Armoured zombie (Defender of Varrock)
+		12732, //Armoured zombie (Defender of Varrock)
+		12733, //Armoured zombie (Defender of Varrock)
+		12734, //Armoured zombie (Defender of Varrock)
+		12736, //Armoured zombie (Defender of Varrock)
+		12738, //Armoured zombie (Defender of Varrock)
+		12755, //Armoured zombie (Defender of Varrock)
+		12757, //Armoured zombie (Defender of Varrock)
+		12758, //Armoured zombie (Defender of Varrock)
 		12735, //Armoured zombie (Defender of Varrock)
+		12739, //Armoured zombie (Defender of Varrock)
+		12761, //Armoured zombie (Defender of Varrock)
+		12763, //Armoured zombie (Defender of Varrock)
 		14135, //Armoured zombie (The Curse of Arrav)
 		14136, //Armoured zombie (The Curse of Arrav)
 		12720, //Armoured zombie (Zemouregal's Base)
+		12721, //Armoured zombie (Zemouregal's Base)
+		12722, //Armoured zombie (Zemouregal's Base)
+		12723, //Armoured zombie (Zemouregal's Base)
+		12724, //Armoured zombie (Zemouregal's Base)
 		12725, //Armoured zombie (Zemouregal's Base)
+		12726, //Armoured zombie (Zemouregal's Base)
+		12727, //Armoured zombie (Zemouregal's Base)
+		12728, //Armoured zombie (Zemouregal's Base)
+		12729, //Armoured zombie (Zemouregal's Base)
 		14113, //Armoured zombie (Zemouregal's Fort)
 		14114, //Armoured zombie (Zemouregal's Fort)
 		14115, //Armoured zombie (Zemouregal's Fort)
@@ -51,7 +80,13 @@ public class UndeadMonsters {
 		1286, //Fiyr Shade
 		1285, //Fiyr Shade
 		10523, //Forgotten Soul (Soul Wars)
+		10524, //Forgotten Soul (Soul Wars)
+		10534, //Forgotten Soul (Soul Wars)
+		10535, //Forgotten Soul (Soul Wars)
 		10525, //Forgotten Soul (Soul Wars)
+		10526, //Forgotten Soul (Soul Wars)
+		10536, //Forgotten Soul (Soul Wars)
+		10537, //Forgotten Soul (Soul Wars)
 		10544, //Forgotten Soul
 		10545, //Forgotten Soul
 		5370, //Ghost (Grave of Scorpius)
@@ -61,8 +96,36 @@ public class UndeadMonsters {
 		3978, //Ghost (Melzar's Maze)
 		3979, //Ghost (Melzar's Maze)
 		85, //Ghost
+		86, //Ghost
+		87, //Ghost
+		88, //Ghost
+		89, //Ghost
+		90, //Ghost
+		91, //Ghost
+		92, //Ghost
+		93, //Ghost
+		94, //Ghost
+		95, //Ghost
+		96, //Ghost
+		97, //Ghost
+		98, //Ghost
+		99, //Ghost
+		472, //Ghost
+		473, //Ghost
+		474, //Ghost
+		505, //Ghost
+		506, //Ghost
+		507, //Ghost
+		7263, //Ghost
+		7264, //Ghost
 		2531, //Ghost
+		2532, //Ghost
+		2533, //Ghost
+		2534, //Ghost
 		2527, //Ghost
+		2528, //Ghost
+		2529, //Ghost
+		2530, //Ghost
 		680, //Giant skeleton (Shadow Dungeon)
 		681, //Giant skeleton (Shadow Dungeon)
 		6440, //Giant skeleton (Tarn's Lair)
@@ -104,6 +167,8 @@ public class UndeadMonsters {
 		7258, //Shade
 		6740, //Shade
 		7604, //Skeletal Mystic
+		7605, //Skeletal Mystic
+		7606, //Skeletal Mystic
 		5237, //Skeleton (Ape Atoll)
 		1688, //Skeleton (Barrows)
 		1687, //Skeleton (Barrows)
@@ -120,6 +185,7 @@ public class UndeadMonsters {
 		13477, //Skeleton (Lucien's camp)
 		13478, //Skeleton (Lucien's camp)
 		13479, //Skeleton (Lucien's camp)
+		6441, //Skeleton (mage)
 		3972, //Skeleton (Melzar's Maze)
 		3973, //Skeleton (Melzar's Maze)
 		3974, //Skeleton (Melzar's Maze)
@@ -150,17 +216,22 @@ public class UndeadMonsters {
 		13499, //Skeleton (Wilderness Agility Course)
 		13500, //Skeleton (Wilderness Agility Course)
 		13501, //Skeleton (Wilderness Agility Course)
-		6441, //Skeleton (mage)
+		1538, //Skeleton brute
 		3358, //Skeleton Champion
+		4491, //Skeleton fremennik
+		4492, //Skeleton fremennik
+		4493, //Skeleton fremennik
+		4494, //Skeleton fremennik
+		4495, //Skeleton fremennik
+		4496, //Skeleton fremennik
+		4497, //Skeleton fremennik
+		4498, //Skeleton fremennik
+		4499, //Skeleton fremennik
+		1540, //Skeleton heavy
 		12107, //Skeleton Hellhound (Calvar'ion)
 		6613, //Skeleton Hellhound (Vet'ion)
 		84, //Skeleton Mage
 		4319, //Skeleton Mage
-		1538, //Skeleton brute
-		4491, //Skeleton fremennik
-		4494, //Skeleton fremennik
-		4497, //Skeleton fremennik
-		1540, //Skeleton heavy
 		1541, //Skeleton thug
 		1539, //Skeleton warlord
 		74, //Skeleton
@@ -188,6 +259,7 @@ public class UndeadMonsters {
 		6476, //Tarn
 		3922, //The Draugen
 		8512, //Tormented Soul
+		8513, //Tormented Soul
 		2999, //Tortured soul
 		8514, //Trapped Soul
 		8529, //Trapped Soul (Nightmare Zone)
@@ -196,29 +268,110 @@ public class UndeadMonsters {
 		3616, //Treus Dayth
 		7272, //Twisted Banshee
 		4500, //Ulfric
-		2145, //Undead Druid
-		5648, //Undead Lumberjack
-		5656, //Undead Lumberjack
-		5665, //Undead Lumberjack
-		5673, //Undead Lumberjack
-		5681, //Undead Lumberjack
-		5689, //Undead Lumberjack
-		5697, //Undead Lumberjack
-		5705, //Undead Lumberjack
-		5713, //Undead Lumberjack
 		2993, //Undead chicken
 		2992, //Undead cow
+		2145, //Undead Druid
+		5648, //Undead Lumberjack
+		5649, //Undead Lumberjack
+		5650, //Undead Lumberjack
+		5651, //Undead Lumberjack
+		5652, //Undead Lumberjack
+		5653, //Undead Lumberjack
+		5654, //Undead Lumberjack
+		5655, //Undead Lumberjack
+		5656, //Undead Lumberjack
+		5657, //Undead Lumberjack
+		5658, //Undead Lumberjack
+		5659, //Undead Lumberjack
+		5660, //Undead Lumberjack
+		5661, //Undead Lumberjack
+		5662, //Undead Lumberjack
+		5663, //Undead Lumberjack
+		5665, //Undead Lumberjack
+		5666, //Undead Lumberjack
+		5667, //Undead Lumberjack
+		5668, //Undead Lumberjack
+		5669, //Undead Lumberjack
+		5670, //Undead Lumberjack
+		5671, //Undead Lumberjack
+		5672, //Undead Lumberjack
+		5673, //Undead Lumberjack
+		5674, //Undead Lumberjack
+		5675, //Undead Lumberjack
+		5676, //Undead Lumberjack
+		5677, //Undead Lumberjack
+		5678, //Undead Lumberjack
+		5679, //Undead Lumberjack
+		5680, //Undead Lumberjack
+		5681, //Undead Lumberjack
+		5682, //Undead Lumberjack
+		5683, //Undead Lumberjack
+		5684, //Undead Lumberjack
+		5685, //Undead Lumberjack
+		5686, //Undead Lumberjack
+		5687, //Undead Lumberjack
+		5688, //Undead Lumberjack
+		5689, //Undead Lumberjack
+		5690, //Undead Lumberjack
+		5691, //Undead Lumberjack
+		5692, //Undead Lumberjack
+		5693, //Undead Lumberjack
+		5694, //Undead Lumberjack
+		5695, //Undead Lumberjack
+		5696, //Undead Lumberjack
+		5697, //Undead Lumberjack
+		5698, //Undead Lumberjack
+		5699, //Undead Lumberjack
+		5700, //Undead Lumberjack
+		5701, //Undead Lumberjack
+		5702, //Undead Lumberjack
+		5703, //Undead Lumberjack
+		5704, //Undead Lumberjack
+		5705, //Undead Lumberjack
+		5706, //Undead Lumberjack
+		5707, //Undead Lumberjack
+		5708, //Undead Lumberjack
+		5709, //Undead Lumberjack
+		5710, //Undead Lumberjack
+		5711, //Undead Lumberjack
+		5712, //Undead Lumberjack
+		5713, //Undead Lumberjack
+		5714, //Undead Lumberjack
+		5715, //Undead Lumberjack
+		5716, //Undead Lumberjack
+		5717, //Undead Lumberjack
+		5718, //Undead Lumberjack
+		5719, //Undead Lumberjack
+		5720, //Undead Lumberjack
 		5344, //Undead one
+		5345, //Undead one
 		5342, //Undead one
+		5343, //Undead one
 		5346, //Undead one
+		5347, //Undead one
+		5348, //Undead one
 		5349, //Undead one
+		5350, //Undead one
+		5351, //Undead one
 		10589, //Urium Shade
 		6143, //Urium Shade
 		6612, //Vet'ion
 		6611, //Vet'ion
 		8058, //Vorkath
+		8060, //Vorkath
 		8059, //Vorkath
+		8061, //Vorkath
 		866, //Zogre
+		867, //Zogre
+		868, //Zogre
+		869, //Zogre
+		870, //Zogre
+		871, //Zogre
+		873, //Zogre
+		874, //Zogre
+		875, //Zogre
+		876, //Zogre
+		877, //Zogre
 		64, //Zombie (Entrana Dungeon)
 		65, //Zombie (Entrana Dungeon)
 		66, //Zombie (Entrana Dungeon)
@@ -229,6 +382,7 @@ public class UndeadMonsters {
 		7488, //Zombie (Kourend)
 		7487, //Zombie (Kourend)
 		3980, //Zombie (Melzar's Maze)
+		3981, //Zombie (Melzar's Maze)
 		6741, //Zombie (Sepulchre of Death)
 		8069, //Zombie (Shayzien Crypts)
 		8067, //Zombie (Shayzien Crypts)
@@ -281,6 +435,7 @@ public class UndeadMonsters {
 		617, //Zombie pirate (Braindeath Island)
 		618, //Zombie pirate (Braindeath Island)
 		563, //Zombie pirate (Harmony Island)
+		564, //Zombie pirate (Harmony Island)
 		575, //Zombie pirate (Harmony Island)
 		576, //Zombie pirate (Harmony Island)
 		577, //Zombie pirate (Harmony Island)
@@ -289,26 +444,38 @@ public class UndeadMonsters {
 		580, //Zombie pirate (Harmony Island)
 		581, //Zombie pirate (Harmony Island)
 		582, //Zombie pirate (Harmony Island)
+		583, //Zombie pirate (Harmony Island)
 		584, //Zombie pirate (Harmony Island)
+		585, //Zombie pirate (Harmony Island)
 		586, //Zombie pirate (Harmony Island)
+		587, //Zombie pirate (Harmony Island)
 		565, //Zombie pirate (Harmony Island)
+		566, //Zombie pirate (Harmony Island)
 		588, //Zombie pirate (Harmony Island)
+		589, //Zombie pirate (Harmony Island)
 		590, //Zombie pirate (Harmony Island)
+		591, //Zombie pirate (Harmony Island)
 		592, //Zombie pirate (Harmony Island)
 		593, //Zombie pirate (Harmony Island)
+		594, //Zombie pirate (Harmony Island)
 		595, //Zombie pirate (Harmony Island)
+		596, //Zombie pirate (Harmony Island)
 		597, //Zombie pirate (Harmony Island)
+		598, //Zombie pirate (Harmony Island)
 		599, //Zombie pirate (Harmony Island)
 		567, //Zombie pirate (Harmony Island)
 		568, //Zombie pirate (Harmony Island)
 		569, //Zombie pirate (Harmony Island)
+		570, //Zombie pirate (Harmony Island)
 		571, //Zombie pirate (Harmony Island)
 		572, //Zombie pirate (Harmony Island)
 		573, //Zombie pirate (Harmony Island)
 		574, //Zombie pirate (Harmony Island)
 		13489, //Zombie pirate
 		13490, //Zombie pirate
+		13491, //Zombie pirate
 		13492, //Zombie pirate
+		13493, //Zombie pirate
 		3969, //Zombie rat
 		3970, //Zombie rat
 		3971, //Zombie rat
