@@ -28,4 +28,6 @@ Flat Armor effect<br>
 
 If you've experienced an issue with this plugin, or have a recommendation on how to improve it, please [create an issue](https://github.com/Matt12yearslater/max-hit/issues) with the relevant details.
 
-Also, feel free to contact or add me on Discord, `@seebity`
+Also, feel free to contact or add me on Discord<br>
+<br>
+[![Discord Presence](https://lanyard.cnrad.dev/api/192119897185189891)](https://discord.com/users/192119897185189891)
